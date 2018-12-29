@@ -11,32 +11,76 @@ class AITransferInterface {
         };
 
         this.visualizePathStyle = {
-            stroke: '#BA55D3'
+            stroke: '#4169E1'
         };
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     pick(bee){
         console.log('Abstract Method:pick() in AITransferInterface.class');
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     pull(bee){
         console.log('Abstract Method:pull() in AITransferInterface.class');
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     transfer(bee){
         console.log('Abstract Method:transfer() in AITransferInterface.class');
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     withdraw(bee){
         console.log('Abstract Method:withdraw() in AITransferInterface.class');
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     findJob(bee){
         console.log('Abstract Method:findJob() in AITransferInterface.class');
     }
 
     run(bee){
-        console.log('Abstract Method:run() in AITransferInterface.class');
+        let creep = bee.creep;
+        // console.log(Game.time, JSON.stringify(creep.memory.job));
+        if(!creep.memory.job){
+            // Find an job
+            this.findJob(bee);
+        } else {
+            // Do the job
+            switch (creep.memory.job) {
+                case this.jobList.Pick:
+                    this.pick(bee);
+                    break;
+                case this.jobList.Pull:
+                    this.pull(bee);
+                    break;
+                case this.jobList.Transfer:
+                    this.transfer(bee);
+                    break;
+                case this.jobList.Withdraw:
+                    this.withdraw(bee);
+                    break;
+                default:
+                    creep.say('❌ 未知工作！');
+                    break;
+            }
+        }
     }
 }
 
@@ -58,8 +102,9 @@ DefaultTransfer.findJob = function(bee){
         let target = undefined;
 
         // Firstly, find dropped-energy nearby first
-        let droppedEnergyList = creep.pos.findInRange(FIND_DROPPED_ENERGY, 3);
+        let droppedEnergyList = creep.pos.findInRange(FIND_DROPPED_RESOURCES, 3);
         if(droppedEnergyList.length > 0) { // Order by L1
+            droppedEnergyList = _.filter(droppedEnergyList, r => r.resourceType === RESOURCE_ENERGY);
             droppedEnergyList = _.sortBy(droppedEnergyList, e =>
                 Math.abs(creep.pos.x-e.pos.x) + Math.abs(creep.pos.y-e.pos.y)
             );
@@ -80,12 +125,14 @@ DefaultTransfer.findJob = function(bee){
 
         // Else, find container that is around the energy-source
         let containers = [];
-        for(let source in bee.myComb.resources.sources){
+
+        _.forEach(bee.myComb.resources.sources, source => {
             let sp = source.pos;
-            containers = _.union(containers, bee.lookForAtArea(
+            containers = _.union(containers, creep.room.lookForAtArea(
                 LOOK_STRUCTURES,sp.y-1, sp.x-1, sp.y+1, sp.x+1, true)
             );
-        }
+
+        });
 
         containers = _.filter(containers,
             s => s.structure && s.structure.structureType === STRUCTURE_CONTAINER
@@ -167,9 +214,11 @@ DefaultTransfer.withdraw = function(bee){
     let target = Game.getObjectById(creep.memory.target);
     if(target && target.store[RESOURCE_ENERGY] > 0){
         let actionStatus = creep.withdraw(target, RESOURCE_ENERGY);
+
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
-                creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
+                let status = creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
+                console.log(`move:${status}`);
                 creep.say('🛴 提取能源!');
                 break;
             case OK:
@@ -185,6 +234,9 @@ DefaultTransfer.withdraw = function(bee){
                 delete creep.memory.target;
                 creep.memory.job = this.jobList.None;
         }
+
+        // console.log('TransferLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, target.structureType);
+
     } else {
         // Job is invalid
         delete creep.memory.target;
@@ -195,8 +247,9 @@ DefaultTransfer.withdraw = function(bee){
 DefaultTransfer.transfer = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
-    if(target && target.store[RESOURCE_ENERGY] > 0){
+    if(target && target.store[RESOURCE_ENERGY] < target.storeCapacity){
         let actionStatus = creep.transfer(target, RESOURCE_ENERGY);
+        console.log(actionStatus, target.structureType);
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
@@ -216,28 +269,5 @@ DefaultTransfer.transfer = function(bee){
     }
 };
 
-DefaultTransfer.run = function(bee){
-    let creep = bee.creep;
-    if(!creep.memory.job){
-        // Find an job
-        creep.memory.job = this.findJob(bee);
-    } else {
-        // Do the job
-        switch (creep.memory.job) {
-            case this.jobList.Pull:
-                this.pull(bee);
-                break;
-            case this.jobList.Transfer:
-                this.transfer(bee);
-                break;
-            case this.jobList.Withdraw:
-                this.withdraw(bee);
-                break;
-            default:
-                creep.say('❌ 未知工作！');
-                break;
-        }
-    }
-};
 
 module.exports.DefaultTransfer = DefaultTransfer;

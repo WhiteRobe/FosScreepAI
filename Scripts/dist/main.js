@@ -20,13 +20,14 @@ module.exports.loop = function () {
 
 
 function timeSchedule() {
-    if(Game.time % 2 === 0){
-        console.log('checkAllBees');
+    if(Game.time % 10 === 0){
+        console.log(`${Game.time}|log:checkAllBees`);
         queen.checkAllBees();
     }
 
     if(Game.time % 1000 === 0){
-        console.log('junction');
-        queen.junction();
+        queen.junction(
+            () => console.log(`${Game.time}|${this.homeRoom}:Queen's nerual junction has been rebuilt!`)
+        );
     }
 }

@@ -1,3 +1,9 @@
+const _ = require('lodash');
+const MK = require('magic.key');
+
+const AIHarvester = require('ai.harvester');
+const AITransfer = require('ai.transfer');
+
 /**
 * A Wrapper-class of Creep.class
 * ClassBee is the base unit in the game
@@ -7,16 +13,16 @@
 * @for ClassBee
 * @param{Creep} creep : The Creep.class which this Bee wrapper
 * @param{ClassComb} myComb : The Comb.class which this bee is belong to
-* @param{ClassQueen} myQueen : Queen of this bee
 */
 const ClassBee = class {
-    constructor(creep, myComb, myQueen){
+    constructor(creep, myComb){
         this._creep = creep;
         this._myComb = myComb;
-        this._myQueen = myQueen;
 
         this._AI = undefined;
+
         this.creepName = creep.name;
+        this.myQueen = myComb.myQueen;
     };
 
     get creep() {
@@ -28,19 +34,11 @@ const ClassBee = class {
     }
 
     get myComb() {
-        return this._comb;
+        return this._myComb;
     }
 
     set myComb(value) {
-        this._comb = value;
-    }
-
-    get myQueen() {
-        return this._myQueen;
-    }
-
-    set myQueen(value) {
-        this._myQueen = value;
+        this._myComb = value;
     }
 
     /**
@@ -66,15 +64,62 @@ const ClassBee = class {
 
     }
 
-    run(callback){
-        // Bee's AI will start to control this bee to work
-        let status = this.AI.run(this.creep);
-        if(callback){
-            callback(status);
-        } else {
-            console.log(`${Game.time}|${this.myComb.combName}:
-                Bee[${this.creep.name}]'s work done, return status ${status}`);
+    run(){
+        this.creep = Game.getObjectById(this.creep.id); // Refresh Data
+
+        if(!this.isAlive){
+            return; // Dead Already, waiting for be cleaned
         }
+        else if(this.creep.spawning) {
+            return; // Bee is spawning
+        }
+
+        if(!this.AI){ // Find proper AI
+            this.AI = this.decideAI();
+        }
+
+        // Bee's AI will start to control this bee to work
+        this.AI.run(this);
+    }
+
+    decideAI() {
+        let occupation = this.creep.memory.occupation;
+        let body = this.creep.body;
+        let parts = {
+            "move" : 0,
+            "work" : 0,
+            "carry" : 0,
+            "attack" : 0,
+            "ranged_attack" : 0,
+            "heal" : 0,
+            "claim" : 0,
+            "tough" : 0
+        };
+        let AI = AIHarvester.DefaultHarvester;
+
+        _.forEach(body, b => parts[b.type] = parts[b.type]+1);
+
+        switch (occupation) {
+            case MK.ROLE.Harvester.value:
+                if(parts.work<5) AI = AIHarvester.DefaultHarvester;
+                else AI = AIHarvester.IntentHarvester;
+                break;
+            case MK.ROLE.Transfer.value:
+                AI = AITransfer.DefaultTransfer;
+                break;
+            case MK.ROLE.Builder.value:
+                break;
+            case MK.ROLE.Upgrader.value:
+                break;
+            case MK.ROLE.Soldier.value:
+                break;
+            case MK.ROLE.Fixer.value:
+                break;
+            default:
+                console.log(`${Game.time}|decideAI:Error unknown-type [${occupation}]`);
+        }
+
+        return AI;
     }
 
 };

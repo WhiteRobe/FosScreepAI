@@ -11,6 +11,7 @@ const MK = require('magic.key');
 * @for ClassComb
 * @param{room} room : The Room.class which this Comb wrapper
 * @param{ClassQueen} :  myQueen : Queen of this Comb
+ * @type {ClassComb}
 */
 const ClassComb = class {
     constructor(room, myQueen){
@@ -51,12 +52,16 @@ const ClassComb = class {
     * Comb junction will active your Comb and find resources, bees, etc.
     * belong to this comb
     */
-    junction(){
+    junction(callback){
         this.findResources();
         this.findMySpawns();
         this.findMyBees();
         this.combIsAvaliable = true;
-        console.log(`${Game.time}|${this.combName}:Comb is linked!`);
+        if(callback){
+            callback();
+        } else {
+            console.log(`${Game.time}|${this.combName}:Comb is linked!`);
+        }
     }
 
     /**
@@ -64,9 +69,9 @@ const ClassComb = class {
     */
     findResources(){
         let resourcesList = this._room.find(FIND_SOURCES);
-        this.resources.sourses = [];
+        this.resources.sources = [];
         for(let r in resourcesList){
-            this.resources.sourses.push(resourcesList[r]);
+            this.resources.sources.push(resourcesList[r]);
         }
 
         let mineralsList = this._room.find(FIND_MINERALS);
@@ -97,17 +102,28 @@ const ClassComb = class {
         this.bees = [];
         for(let c in Game.creeps){
             let creep = Game.creeps[c];
+
             if(creep.memory.myCombName === this.combName){
-                this.bees.push(new Bee(creep, this, this.myQueen));
+                this.bees.push(new Bee(creep, this));
+                console.log(`${Game.time}|${this.combName}:Find Bee ${creep.name}, memory is 
+                    ${JSON.stringify(creep.memory)}!`);
             }
         }
     }
 
+    /**
+     *
+     * @param{ClassBee} newBee
+     */
     addBee(newBee){
         newBee.myComb = this;
-        this.bees = _.union(this.bees, [newBee]);
+        this.bees.push(newBee);
     }
 
+    /**
+     *
+     * @param{ClassBee} removedBee
+     */
     removeBee(removedBee){
         removedBee.myComb = undefined;
         this.bees = _.without(this.bees, removedBee);
@@ -151,50 +167,49 @@ const ClassComb = class {
     checkBees(){
         let beesAlive = [];
 
-        let DefaultHarvester  = [];
-        let IntentHarvester  = [];
-        let DefaultTransfer  = [];
-        let DefaultUpgrader  = [];
-        let DefaultFixer  = [];
-        let DefaultBuilder  = [];
-        let DefaultSoldier  = [];
+        // These Array's name should be
+        // keep the same as magic.ke.js/_MagicKeyRole.{keys}
+        // for reflecting
+        let Harvester  = [];
+        let Transfer  = [];
+        let Upgrader  = [];
+        let Fixer  = [];
+        let Builder  = [];
+        let Soldier  = [];
 
         _.forEach(this.bees, bee =>{
-            if(bee.isAlive){
-                beesAlive.push(bee);
-                delete Memory.creeps[bee.creepName];
+            if(!bee.isAlive){
+                delete Memory.creeps[bee.creepName]; // clean dead bees
             } else {
                 beesAlive.push(bee);
                 switch (bee.creep.memory.occupation) {
-                    case MK.PRO.Default + MK.ROLE.Harvester:
-                        DefaultHarvester.push(bee);
+                    case MK.ROLE.Harvester.value:
+                        Harvester.push(bee);
                         break;
-                    case MK.PRO.Intent + MK.ROLE.Harvester:
-                        IntentHarvester.push(bee);
+                    case MK.ROLE.Transfer.value:
+                        Transfer.push(bee);
                         break;
-                    case MK.PRO.Default + MK.ROLE.Transfer:
-                        DefaultTransfer.push(bee);
+                    case MK.ROLE.Upgrader.value:
+                        Upgrader.push(bee);
                         break;
-                    case MK.PRO.Default + MK.ROLE.Upgrader:
-                        DefaultUpgrader.push(bee);
+                    case MK.ROLE.Fixer.value:
+                        Fixer.push(bee);
                         break;
-                    case MK.PRO.Default + MK.ROLE.Fixer:
-                        DefaultFixer.push(bee);
+                    case MK.ROLE.Builder.value:
+                        Builder.push(bee);
                         break;
-                    case MK.PRO.Default + MK.ROLE.Builder:
-                        DefaultBuilder.push(bee);
-                        break;
-                    case MK.PRO.Default + MK.ROLE.Soldier:
-                        DefaultSoldier.push(bee);
+                    case MK.ROLE.Soldier.value:
+                        Soldier.push(bee);
                         break;
                 }
             }
         });
 
-        this.bees = beesAlive;
-        let beeList = {
-            DefaultHarvester,IntentHarvester,DefaultTransfer,
-            DefaultUpgrader,DefaultBuilder,DefaultSoldier
+        this.bees = beesAlive; // Save all alive bees
+
+        let beeList = { // Population-Summary
+            Harvester, Transfer, Upgrader,
+            Fixer, Builder, Soldier
         };
 
         this.oviposit(beeList);
@@ -206,6 +221,7 @@ const ClassComb = class {
      * Run this comb, every Bee in this room will run
      */
     run(){
+        // this.room = Game.getObjectById(this.room.id); // Refresh Data
         _.forEach(this.bees, bee => bee.run());
     }
 
@@ -214,6 +230,10 @@ const ClassComb = class {
 
     }
 
+    /**
+     *
+     * @param beeList : a Population-Summary object
+     */
     oviposit(beeList){
         let womb = this.myQueen.womb;
 

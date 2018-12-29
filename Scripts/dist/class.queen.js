@@ -64,7 +64,7 @@ const ClassQueen = class {
     * 'Neural Junction' means: Queen will find all of her bees in each room
     * But at first, queen need to find all of her combs/room
     * */
-    junction(){
+    junction(callback){
         this.combs = [];
         for(let r in Game.rooms){
             // Game.rooms contains a map of rooms which your creep is present
@@ -80,7 +80,11 @@ const ClassQueen = class {
         }
 
         this.queenIsAvaliable = true;
-        console.log(`${Game.time}|${this.homeRoom}:Queen is awake!`);
+        if(callback){
+            callback();
+        } else {
+            console.log(`${Game.time}|${this.homeRoom}:Queen is awake!`);
+        }
     }
 
 
