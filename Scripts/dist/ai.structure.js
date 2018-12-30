@@ -37,7 +37,7 @@ class AIStructureInterface extends  AIInterface{
     }
 
     run(beeStructure) {
-        console.log(Game.time, beeStructure.structureID, this.AIName, JSON.stringify(beeStructure.memory));
+        //console.log(Game.time, beeStructure.structureID, this.AIName, JSON.stringify(beeStructure.memory));
         if(!beeStructure.memory.job){
             // Find an job
             this.findJob(beeStructure);
@@ -64,10 +64,10 @@ class AIStructureInterface extends  AIInterface{
     }
 }
 
-const DefaultTowerAI = new AIStructureInterface();
-DefaultTowerAI.AIName = "DefaultTowerAI";
+const DefaultTower = new AIStructureInterface();
+DefaultTower.AIName = "DefaultTower";
 
-DefaultTowerAI.findJob = function(beeStructure){
+DefaultTower.findJob = function(beeStructure){
     let structure = beeStructure.structure;
 
     let closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
@@ -99,7 +99,7 @@ DefaultTowerAI.findJob = function(beeStructure){
     beeStructure.memory.job = this.jobList.None;
 };
 
-DefaultTowerAI.repair = function(beeStructure){
+DefaultTower.repair = function(beeStructure){
     let structure = beeStructure.structure;
     let target = Game.getObjectById(beeStructure.memory.target);
     if(target && target.hits < target.hitsMax){
@@ -122,7 +122,7 @@ DefaultTowerAI.repair = function(beeStructure){
     }
 };
 
-DefaultTowerAI.attack = function(beeStructure){
+DefaultTower.attack = function(beeStructure){
     let structure = beeStructure.structure;
     let target = Game.getObjectById(beeStructure.memory.target);
     if(target && target.hits > 0){
@@ -145,7 +145,7 @@ DefaultTowerAI.attack = function(beeStructure){
     }
 };
 
-DefaultTowerAI.heal = function(beeStructure){
+DefaultTower.heal = function(beeStructure){
     let structure = beeStructure.structure;
     let target = Game.getObjectById(beeStructure.memory.target);
     if(target && target.hits < target.hitsMax){
@@ -168,4 +168,4 @@ DefaultTowerAI.heal = function(beeStructure){
     }
 };
 
-module.exports.DefaultTowerAI = DefaultTowerAI;
+module.exports.DefaultTower = DefaultTower;

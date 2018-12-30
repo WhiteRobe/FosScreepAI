@@ -65,13 +65,13 @@ const populationPlan = {
             num : 1
         },
         Transfer :{
-            num : 0
+            num : 1
         },
         Upgrader : {
             num : 1
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
             num : 0
@@ -87,16 +87,16 @@ const populationPlan = {
             num : 1
         },
         Transfer :{
-            num : 0
+            num : 1
         },
         Upgrader : {
             num : 1
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0
@@ -106,19 +106,19 @@ const populationPlan = {
         // energyCapacity : 300 + 30 * 50
         level:5,
         Harvester : {
-            num : 0
+            num : 1
         },
         Transfer :{
-            num : 0
+            num : 2
         },
         Upgrader : {
-            num : 0
+            num : 1
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0
@@ -302,7 +302,9 @@ function decideType(comb, occupation) {
 
     result.memory.occupation = occupation;
     result.memory.myCombName = comb.combName;
-    console.log('创建人口配置:', JSON.stringify(result), roomLevel, roomEnergy, roomEnergyCapacity, sourceNum);
+    console.log(`创建人口配置: ${JSON.stringify(result)} \n`+
+        `roomLevel:${roomLevel}, roomEnergy:${roomEnergy},`+
+        `roomEnergyCapacity:${roomEnergyCapacity}, sourceNum:${sourceNum}`);
     return result;
 }
 

@@ -61,7 +61,7 @@ class BeeStructure{
 
         switch (type) {
             case STRUCTURE_TOWER:
-                AI = AIStructure.DefaultTowerAI;
+                AI = AIStructure.DefaultTower;
                 break;
             default:
                 console.log(`${Game.time}|${this.myComb.combName}: Decide AI Error => unknown-type [${type}]`);

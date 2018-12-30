@@ -55,6 +55,15 @@ class AITransferInterface extends AIInterface{
     /**
      * Abstract
      * @param bee
+     * @return {object} // a structure of storage-type object
+     */
+    findNextStorage(bee){
+        console.log('Abstract Method:findNextStorage() in AITransferInterface.class');
+    }
+
+    /**
+     * Abstract
+     * @param bee
      */
     findJob(bee){
         console.log('Abstract Method:findJob() in AITransferInterface.class');
@@ -62,7 +71,7 @@ class AITransferInterface extends AIInterface{
 
     run(bee){
         let creep = bee.creep;
-        console.log(Game.time, bee.creepName, JSON.stringify(creep.memory.job));
+        //console.log(Game.time, bee.creepName, JSON.stringify(creep.memory.job));
         if(!creep.memory.job){
             // Find an job
             this.findJob(bee);
@@ -101,6 +110,26 @@ const DefaultProducer = InterfaceCivilian.DefaultProducer;
 */
 const DefaultTransfer = new AITransferInterface();
 DefaultTransfer.AIName = "DefaultTransfer";
+
+DefaultTransfer.findNextStorage = function(bee){
+    let creep = bee.creep;
+    let target = undefined;
+
+    let tempStoreList = DefaultProducer.findExtensionOrSpawn(bee, false);
+    tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
+        Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
+    );
+    target = tempStoreList[0];// Find closest one
+
+    if(!target){
+        // If not found, or whatever:
+        // Anyway, if there is a storage-structure;
+        // noinspection JSValidateTypes
+        target = bee.myComb.room.storage;
+    }
+
+    return target;
+};
 
 DefaultTransfer.findJob = function(bee){
     let creep = bee.creep;
@@ -160,35 +189,13 @@ DefaultTransfer.findJob = function(bee){
         }
     } else {
         // Store energy
-        let target = undefined;
-
-        let tempStoreList = DefaultProducer.findExtensionOrSpawn(bee, false);
-        tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
-            Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
-        );
-        target = tempStoreList[0];
+        let target = this.findNextStorage(bee);
         if(target){
             creep.memory.job = this.jobList.Transfer;
             creep.memory.target = target.id;
-            return;
+        } else {
+            creep.say("❌ 无储存空间");
         }
-
-
-        target = bee.myComb.room.storage;// Find storage first
-        if(target){
-            creep.memory.job = this.jobList.Transfer;
-            creep.memory.target = target.id;
-            return;
-        }
-
-        // tempStoreList = DefaultProducer.findContainerOrStorage(bee, false);
-        // tempStoreList = _.filter(tempStoreList, s => s.structureType === STRUCTURE_CONTAINER)
-        // target = tempStoreList[0];
-        // if(target){
-        //     creep.memory.job = this.jobList.Transfer;
-        //     creep.memory.target = target.id;
-        //     return;
-        // }
     }
 };
 
@@ -224,7 +231,7 @@ DefaultTransfer.withdraw = function(bee){
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
-                creep.say('🛴 提取能源!');
+                creep.say('🥢 提取能源!');
                 break;
             case OK:
                 if(creep.carry.energy === creep.carryCapacity){
@@ -252,7 +259,7 @@ DefaultTransfer.withdraw = function(bee){
 DefaultTransfer.transfer = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
-    console.log(target.structureType, target.energy);
+
     if(target &&
         ( target.energy!==undefined && target.energy < target.energyCapacity // hot-fix spawn or extension
         || target.store!==undefined && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
@@ -265,6 +272,15 @@ DefaultTransfer.transfer = function(bee){
                 break;
             case OK:
             case ERR_FULL:
+                if(creep.carry.energy > 0){
+                    // Still need to do transfer-job
+                    let nextTarget = this.findNextStorage(bee);
+                    if(nextTarget){ // To save a tick, just do this
+                        creep.memory.target = nextTarget.id;
+                        creep.say("➕ 更新目标.");
+                        //creep.memory.job = this.jobList.Transfer;
+                    }
+                } // Else goto default
             default:
                 // Job cause fatal-error or job is done
                 delete creep.memory.target;

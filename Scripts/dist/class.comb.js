@@ -108,8 +108,8 @@ const ClassComb = class {
 
             if(creep.memory.myCombName === this.combName){
                 this.bees.push(new Bee(creep, this));
-                console.log(`${Game.time}|${this.combName}: Find Bee [${creep.name}], memory is 
-                    ${JSON.stringify(creep.memory)}!`);
+                console.log(`${Game.time}|${this.combName}: Find Bee [${creep.name}], memory is \n`+
+                    `${JSON.stringify(creep.memory)}!`);
             }
         }
     }
