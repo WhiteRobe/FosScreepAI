@@ -110,6 +110,7 @@ DefaultHarvester.AIName = "DefaultHarvester";
 
 DefaultHarvester.findJob = function (bee) {
     let creep = bee.creep;
+    creep.say("🕗 找工作中");
     if(creep.carry.energy >= creep.carryCapacity){
         let target = DefaultProducer.findExtensionOrSpawn(bee, false); // extension first
         if(target){
@@ -189,6 +190,7 @@ IntentHarvester.AIName = "IntentHarvester";
 
 IntentHarvester.findJob = function(bee){
     let creep = bee.creep;
+    creep.say("🕗 找工作中");
     if(creep.carry.energy === creep.carryCapacity){
         // In range-1, no need assign a target, it's a waste of CPU
         creep.memory.job = this.jobList.Transfer;

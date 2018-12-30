@@ -112,7 +112,7 @@ const populationPlan = {
             num : 2
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
             num : 1
@@ -130,7 +130,7 @@ const populationPlan = {
             num : 1
         },
         Transfer :{
-            num : 1
+            num : 2
         },
         Upgrader : {
             num : 1
@@ -224,11 +224,11 @@ const ClassQueenWomb = class {
                         );
 
                         if(actionStatus === OK){
-                            console.log(`${Game.time}|${comb.combName}:Create Bee:${newBeeName}, return OK!`);
+                            console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return OK!`);
                             let newBee = new Bee(Game.creeps[newBeeName], comb);
                             comb.addBee(newBee);
                         } else {
-                            console.log(`${Game.time}|${comb.combName}:Create Bee:${newBeeName}, return ${spawnCodeToString(actionStatus)}!`);
+                            console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return ${spawnCodeToString(actionStatus)}!`);
                         }
                         spawnsIndexFrom += 1; // Note that this one/spawn has been used
                         break;

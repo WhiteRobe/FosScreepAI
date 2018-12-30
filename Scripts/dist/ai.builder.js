@@ -140,6 +140,7 @@ DefaultBuilder.AIName = "DefaultBuilder";
 
 DefaultBuilder.findJob = function(bee){
     let creep = bee.creep;
+    creep.say("🕗 找工作中");
     if(creep.carry.energy <= 0){
         let target = creep.room.storage;
         if(target){
