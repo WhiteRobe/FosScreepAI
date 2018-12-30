@@ -3,6 +3,10 @@ const MK = require('magic.key');
 
 const AIHarvester = require('ai.harvester');
 const AITransfer = require('ai.transfer');
+const AIUpgrader = require('ai.upgrader');
+const AIFixer = require('ai.fixer');
+const AIBuilder = require('ai.builder');
+const AISoldier = require('ai.soldier');
 
 /**
 * A Wrapper-class of Creep.class
@@ -56,7 +60,9 @@ const ClassBee = class {
     * Wrapper Attribute: Is this bee still alive?
     */
     get isAlive(){
-        return this._creep!==undefined;
+        this.creep = Game.creeps[this.creepName]; // Refresh-Creep-Data
+        console.log('isAlive',this.creep);
+        return this.creep!==undefined;
     }
 
     statistics(){
@@ -65,14 +71,13 @@ const ClassBee = class {
     }
 
     run(){
-        this.creep = Game.getObjectById(this.creep.id); // Refresh Data
 
-        if(!this.isAlive){
-            return; // Dead Already, waiting for be cleaned
+        if(!this.isAlive) {
+            // Bee is spawning, no id at this moment
+            return console.log(`${Game.time}|${this.myComb.combName}:`+
+                `Bee ${this.creepName} is dead or spawning. Waiting next-step...`);
         }
-        else if(this.creep.spawning) {
-            return; // Bee is spawning
-        }
+
 
         if(!this.AI){ // Find proper AI
             this.AI = this.decideAI();
@@ -101,19 +106,24 @@ const ClassBee = class {
 
         switch (occupation) {
             case MK.ROLE.Harvester.value:
-                if(parts.work<5) AI = AIHarvester.DefaultHarvester;
+                if(parts.carry) AI = AIHarvester.AlwaysHarvester;
+                else if(parts.work<5) AI = AIHarvester.DefaultHarvester;
                 else AI = AIHarvester.IntentHarvester;
                 break;
             case MK.ROLE.Transfer.value:
                 AI = AITransfer.DefaultTransfer;
                 break;
-            case MK.ROLE.Builder.value:
-                break;
             case MK.ROLE.Upgrader.value:
+                AI = AIUpgrader.DefaultUpgrader;
                 break;
-            case MK.ROLE.Soldier.value:
+            case MK.ROLE.Builder.value:
+                AI = AIBuilder.DefaultBuilder;
                 break;
             case MK.ROLE.Fixer.value:
+                AI = AIFixer.DefaultFixer;
+                break;
+            case MK.ROLE.Soldier.value:
+                AI = AISoldier.DefaultSoldier;
                 break;
             default:
                 console.log(`${Game.time}|decideAI:Error unknown-type [${occupation}]`);

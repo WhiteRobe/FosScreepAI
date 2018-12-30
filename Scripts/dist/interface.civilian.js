@@ -2,7 +2,7 @@ const _ =require('lodash');
 
 class ConsumerInterface{
     /**
-     * Behavior : Find Storage Storage
+     * Behavior : Find Closest Energy Storage
      * @param{ClassBee} bee : the bee carry out this action
      */
     findClosestEnergyStorage(bee){
@@ -86,9 +86,9 @@ DefaultProducer.findSource = function(bee){
     // 1.Bee is newborn, he will find the Energy-Source with less harvester around
     // 2.Keep stay in position, until the Energy-Source nearby to be refreshed
     let creep = bee.creep;
-    let sources = [];
+    let sources = bee.myComb.resources.sources;
     if(creep.pos.findInRange(FIND_MY_SPAWNS,1).length >0){
-        sources = _.sortByOrder(bee.myComb.resources.sources,['mount'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
+        sources = _.sortByOrder(sources,['mount'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
     } else {
         sources = _.sortBy(sources, r =>
             Math.abs(creep.pos.x - r.pos.x) + Math.abs(creep.pos.y - r.pos.y)

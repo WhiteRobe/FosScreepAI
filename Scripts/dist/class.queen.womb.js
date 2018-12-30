@@ -109,10 +109,10 @@ const populationPlan = {
             num : 0
         },
         Transfer :{
-            num : 0
+            num : 1
         },
         Upgrader : {
-            num : 1
+            num : 0
         },
         Fixer : {
             num : 0
@@ -130,16 +130,16 @@ const populationPlan = {
             num : 1
         },
         Transfer :{
-            num : 0
+            num : 1
         },
         Upgrader : {
             num : 1
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0
@@ -241,7 +241,7 @@ const ClassQueenWomb = class {
 
 module.exports = ClassQueenWomb;
 
-// private
+// --------- private ---------
 function decideType(comb, occupation) {
     let result = {
         part:[],
@@ -256,9 +256,17 @@ function decideType(comb, occupation) {
     switch (occupation) {
         case MK.ROLE.Harvester.value:
             if(roomLevel===1) result.part = [WORK, CARRY, MOVE];
+            else if(roomEnergy/roomEnergyCapacity>0.5 && 300<=roomEnergy && roomEnergy<400){
+                result.part = [WORK, WORK, CARRY, MOVE];
+            }
+            else if(roomEnergy/roomEnergyCapacity>0.5 && 400<=roomEnergy && roomEnergy<550){
+                result.part = [WORK, WORK, WORK, CARRY, MOVE];
+            }
+            else if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=550){
+                result.part = [WORK, WORK, WORK, WORK, WORK, MOVE];
+            }
             else{
-                if(roomEnergy>=300) result.part = [WORK, WORK, CARRY, MOVE];
-                else result.part = [WORK, CARRY, MOVE];
+                result.part = [WORK, CARRY, MOVE];
             }
             break;
         case MK.ROLE.Transfer.value:
@@ -266,6 +274,25 @@ function decideType(comb, occupation) {
             else{
                 if(roomEnergy>=300) result.part = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
                 else result.part = [CARRY, CARRY, MOVE];
+            }
+            break;
+        case MK.ROLE.Upgrader.value: // Upgrader have the same parts with builder
+        case MK.ROLE.Builder.value:
+            if(roomLevel <=2) result.part = [WORK, CARRY, MOVE];
+            else if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
+                result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+            } else {
+                result.part = [WORK, CARRY, MOVE];
+            }
+            break;
+        case MK.ROLE.Fixer.value:
+            result.part = [CARRY, CARRY, MOVE];
+            break;
+        case MK.ROLE.Soldier.value:
+            if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
+                result.part = [TOUGH, TOUGH, TOUGH, TOUGH, ATTACK, ATTACK, MOVE, MOVE, MOVE];
+            } else {
+                result.part = [TOUGH, ATTACK, MOVE];
             }
             break;
         default:
@@ -299,4 +326,3 @@ function spawnCodeToString(code) {
             return 'UNKNOWN';
     }
 }
-

@@ -1,5 +1,4 @@
 const _ = require('lodash');
-const InterfaceCivilian = require('interface.civilian');
 
 class AIUpgraderInterface {
     constructor(){
@@ -12,6 +11,8 @@ class AIUpgraderInterface {
         this.visualizePathStyle = {
             stroke: '#F5FFFA'
         };
+
+        this.AIName = "AIUpgraderInterface";
     }
 
     /**
@@ -36,15 +37,18 @@ class AIUpgraderInterface {
                     creep.say("🔰 升级控制器!");
                     break;
                 case OK:
-                    if(creep.carry.energy ===0){
+                    if(creep.carry.energy === 0){
                         // Job is Done
                         creep.memory.job = this.jobList.Withdraw; // Just switch to withdraw to save ticks
                     }
+                    break;
                 case ERR_NOT_ENOUGH_RESOURCES:
                 default:
                     // Job is valid
-                    creep.memory.job = this.jobList.None;
+                    //creep.memory.job = this.jobList.None;
+                    this.findJob(bee);
             }
+            // console.log('UpgraderLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, room.controller);
         }
     }
 
@@ -59,7 +63,7 @@ class AIUpgraderInterface {
     run(bee){
 
         let creep = bee.creep;
-        //console.log(Game.time, JSON.stringify(creep.memory.job));
+        //console.log(Game.time, bee.creepName, JSON.stringify(creep.memory.job));
         if(!creep.memory.job){
             // Find an job
             this.findJob(bee);
@@ -79,13 +83,22 @@ class AIUpgraderInterface {
         }
     }
 }
+
+const InterfaceCivilian = require('interface.civilian');
 const DefaultConsumer = InterfaceCivilian.DefaultConsumer;
 
+/**
+ * DefaultUpgrader always try to upgrade controller,
+ * find energy in the room in which the controller located
+ *
+ * @type {AIUpgraderInterface}
+ */
 const DefaultUpgrader = new AIUpgraderInterface();
+DefaultUpgrader.AIName = "DefaultUpgrader";
 
 DefaultUpgrader.findJob = function (bee) {
     let creep = bee.creep;
-    if(creep.energy === 0){
+    if(creep.carry.energy <= 0){
         let target = creep.room.storage;
         if(target){
             creep.memory.job = this.jobList.Withdraw;
@@ -101,6 +114,7 @@ DefaultUpgrader.findJob = function (bee) {
             return;
         }
 
+
     } else {
         creep.memory.job = this.jobList.Upgrade;
     }
@@ -108,24 +122,33 @@ DefaultUpgrader.findJob = function (bee) {
 
 DefaultUpgrader.withdraw = function (bee) {
     let creep = bee.creep;
-    let target = Game.getObjectById(creep.memory.target.id);
+    let target = Game.getObjectById(creep.memory.target);
     if(target){
         let energy = creep.room.energyAvailable;
         let capacity = creep.room.energyCapacityAvailable;
-        let properWithdrawNum = 50;
-        let actionStatus = creep.withdraw(target, RESOURCE_ENERGY, properWithdrawNum);
+        let properWithdrawNum = energy-Math.ceil(0.5 * capacity);
+        let actionStatus = creep.withdraw(target, RESOURCE_ENERGY,
+            Math.min(properWithdrawNum, creep.carryCapacity)-creep.carry[RESOURCE_ENERGY]);
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
                 creep.say("🧀 获取资源!");
+                break;
             case OK:
-
             default:
-                creep.memory.job = this.jobList.None;
+                // Job done or was valid
                 delete creep.memory.target;
+                this.findJob(bee);
+                //creep.memory.job = this.jobList.None;
+
         }
+        // console.log('UpgraderLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, target.structureType);
     } else {
-        creep.memory.job = this.jobList.None;
+        // Job is valid
         delete creep.memory.target;
+        this.findJob(bee);
+        //creep.memory.job = this.jobList.None;
     }
 };
+
+module.exports.DefaultUpgrader = DefaultUpgrader;

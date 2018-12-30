@@ -179,6 +179,7 @@ const ClassComb = class {
 
         _.forEach(this.bees, bee =>{
             if(!bee.isAlive){
+                console.log(`${Game.time}|${bee.myComb.combName}:Clean dead-body ${bee.creepName}`);
                 delete Memory.creeps[bee.creepName]; // clean dead bees
             } else {
                 beesAlive.push(bee);

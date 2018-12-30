@@ -13,6 +13,8 @@ class AITransferInterface {
         this.visualizePathStyle = {
             stroke: '#4169E1'
         };
+
+        this.AIName = "AITransferInterface";
     }
 
     /**
@@ -95,6 +97,7 @@ const DefaultProducer = InterfaceCivilian.DefaultProducer;
  * @type {AITransferInterface}
 */
 const DefaultTransfer = new AITransferInterface();
+DefaultTransfer.AIName = "DefaultTransfer";
 
 DefaultTransfer.findJob = function(bee){
     let creep = bee.creep;
@@ -217,8 +220,7 @@ DefaultTransfer.withdraw = function(bee){
 
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
-                let status = creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
-                console.log(`move:${status}`);
+                creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
                 creep.say('🛴 提取能源!');
                 break;
             case OK:
@@ -247,9 +249,10 @@ DefaultTransfer.withdraw = function(bee){
 DefaultTransfer.transfer = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
-    if(target && target.store[RESOURCE_ENERGY] < target.storeCapacity){
+    if(target &&
+        ( target.energy && target.energy < target.energyCapacity // hot-fix spawn or extension
+        || target.store && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
         let actionStatus = creep.transfer(target, RESOURCE_ENERGY);
-        console.log(actionStatus, target.structureType);
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });

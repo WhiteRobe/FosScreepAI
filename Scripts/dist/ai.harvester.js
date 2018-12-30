@@ -11,6 +11,8 @@ class AIHarvesterInterface {
         this.visualizePathStyle = {
             stroke: '#DAA520'
         };
+
+        this.AIName = "AIHarvesterInterface";
     }
 
     /**
@@ -102,10 +104,12 @@ const DefaultProducer = InterfaceCivilian.DefaultProducer;
  * @type {AIHarvesterInterface}
  */
 const DefaultHarvester = new AIHarvesterInterface();
+DefaultHarvester.AIName = "DefaultHarvester";
+
 DefaultHarvester.findJob = function (bee) {
     let creep = bee.creep;
-    if(creep.carry.energy === creep.carryCapacity){
-        let target = DefaultProducer.findExtensionOrSpawn(bee, true);
+    if(creep.carry.energy >= creep.carryCapacity){
+        let target = DefaultProducer.findExtensionOrSpawn(bee, false); // extension first
         if(target){
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Transfer;
@@ -179,6 +183,8 @@ DefaultHarvester.transfer = function (bee) {
  * @type {AIHarvesterInterface}
  */
 const IntentHarvester = new AIHarvesterInterface();
+IntentHarvester.AIName = "IntentHarvester";
+
 IntentHarvester.findJob = function(bee){
     let creep = bee.creep;
     if(creep.carry.energy === creep.carryCapacity){
@@ -214,60 +220,76 @@ IntentHarvester.transfer = function(bee){
     creep.memory.job = this.jobList.None; // Job is done
 };
 
-// IntentHarvester.harvest = function(bee){
-//     let creep = bee.creep;
-//     let target = Game.getObjectById(creep.memory.target);
-//     if(target){
-//         let actionStatus = creep.harvest(target);
-//         switch (actionStatus) {
-//             case ERR_NOT_IN_RANGE:
-//                 creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
-//                 creep.say('💰 开采能源!');
-//                 break;
-//             case OK:
-//                 if(creep.carry.energy === creep.carryCapacity){// Job is done
-//                     creep.memory.job = this.jobList.None;
-//                     delete creep.memory.target;
-//                 }
-//                 break;
-//             case ERR_TIRED:
-//             case ERR_NOT_ENOUGH_RESOURCES:
-//                 creep.say('🌙 等待资源重生!');
-//                 break;
-//             default:
-//                 // Job cause fatal-error
-//                 creep.memory.job = this.jobList.None;
-//                 delete creep.memory.target;
-//         }
-//     } else {
-//         // Job is valid
-//         creep.memory.job = this.jobList.None;
-//         delete creep.memory.target;
-//     }
-//
-// };
+/**
+ * AlwaysHarvester.class will focus on harvest
+ * and drop resources immediately
+ * He'll try to find container around sources then step up,
+ * so the dropped-resources can be auto-collected by container
+ * Never do transfer-job!
+ *
+ * @type {AIHarvesterInterface}
+ */
+const AlwaysHarvester = new AIHarvesterInterface();
+AlwaysHarvester.AIName = "AlwaysHarvester";
 
-// IntentHarvester.run = function (bee){
-//     let creep = bee.creep;
-//     if(!creep.memory.job){
-//         // Find an job
-//         this.findJob(bee);
-//     } else {
-//         // Do the job
-//         switch (creep.memory.job) {
-//             case this.jobList.Transfer:
-//                 this.transfer(bee);
-//                 break;
-//             case this.jobList.Harvest:
-//                 this.harvest(bee);
-//                 break;
-//             default:
-//                 creep.say('❌ 未知工作！');
-//                 break;
-//         }
-//     }
-// };
+AlwaysHarvester.findJob = function(bee){
+    let creep = bee.creep;
+    if(creep.carry.energy === 0){
+        let target = DefaultProducer.findSource(bee); // @see interface.civilian
+        if(target){
+            let containers = target.room.lookForAtArea(LOOK_STRUCTURES,
+                target.pos.y-1,target.pos.x-1,target.pos.y+1,target.pos.x+1);
+            containers = _.filter(containers, c => c.structureType === STRUCTURE_CONTAINER);
+            if(containers.length>0){
+                creep.memory.containerPos = containers[0].id;
+            }
+            creep.memory.target = target.id;
+            creep.memory.job = this.jobList.Harvest;
+        } else {
+            creep.say('💰 开采能源!');
+        }
+    } else {
+        creep.say('❌ 房间里无能源点!');
+    }
+};
 
+AlwaysHarvester.harvest = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+
+    let containerPos = undefined;
+    if(creep.memory.containerPos){ // try to find an container
+        containerPos = Game.getObjectById(creep.memory.containerPos);
+    }
+
+    if(target){
+        let actionStatus = creep.harvest(target);
+        switch (actionStatus) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(containerPos?containerPos:target,{ visualizePathStyle:this.visualizePathStyle });
+                creep.say('💰 开采能源!');
+                break;
+            case ERR_TIRED:
+            case ERR_NOT_ENOUGH_RESOURCES:
+                creep.say('🌙 等待资源重生!');
+                break;
+            case OK:
+                break; // Just keep harvesting
+            default:
+                // Job cause fatal-error
+                creep.memory.job = this.jobList.None;
+                delete creep.memory.target;
+                if(creep.memory.containerPos) delete creep.memory.containerPos;
+        }
+        //console.log(`actionStatus:${actionStatus}`);
+    } else {
+        // Job is valid
+        creep.memory.job = this.jobList.None;
+        delete creep.memory.target;
+        if(creep.memory.containerPos) delete creep.memory.containerPos;
+    }
+};
 
 module.exports.DefaultHarvester = DefaultHarvester;
 module.exports.IntentHarvester = IntentHarvester;
+module.exports.AlwaysHarvester = IntentHarvester;
