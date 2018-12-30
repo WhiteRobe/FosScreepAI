@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const Bee = require('class.bee');
+const BeeStructure = require('class.beestructure');
 const MK = require('magic.key');
 
 /**
@@ -21,6 +22,7 @@ const ClassComb = class {
         this.resources = {}; // A resources map contains key:sources(list[Resource]) and key:mineral(Mineral)
         this.spawns = []; // A array store your STRUCTURE_SPAWNS in this comb
         this.bees = []; // A array store your bees/creeps belong to this comb
+        this.structures = []; // A array store your structures belong to this comb(store by object.id)
 
         this.combIsAvaliable = false;
 
@@ -56,11 +58,12 @@ const ClassComb = class {
         this.findResources();
         this.findMySpawns();
         this.findMyBees();
+        this.findMyStructures();
         this.combIsAvaliable = true;
         if(callback){
             callback();
         } else {
-            console.log(`${Game.time}|${this.combName}:Comb is linked!`);
+            console.log(`${Game.time}|${this.combName}: Comb is linked!`);
         }
     }
 
@@ -105,10 +108,24 @@ const ClassComb = class {
 
             if(creep.memory.myCombName === this.combName){
                 this.bees.push(new Bee(creep, this));
-                console.log(`${Game.time}|${this.combName}:Find Bee ${creep.name}, memory is 
+                console.log(`${Game.time}|${this.combName}: Find Bee [${creep.name}], memory is 
                     ${JSON.stringify(creep.memory)}!`);
             }
         }
+    }
+
+    /**
+     *Find specific-structures belong to this comb
+     */
+    findMyStructures(){
+        this.structures = [];
+        let targetStructures = this.room.find(FIND_STRUCTURES, {
+            filter: s => s.structureType === STRUCTURE_TOWER
+        });
+        _.forEach(targetStructures, s => {
+            this.structures.push(new BeeStructure(s, this));
+            console.log(`${Game.time}|${this.combName}: Find Structure [${s.structureType}:${s.id}]!`);
+        })
     }
 
     /**
@@ -223,14 +240,15 @@ const ClassComb = class {
      */
     run(){
         // this.room = Game.getObjectById(this.room.id); // Refresh Data
+        _.forEach(this.structures, structure => structure.run());
         _.forEach(this.bees, bee => bee.run());
     }
 
 
-    notify(){
-
+    notify(event) {
+        console.log(`${Game.time}|${this.combName}:Event-Attach =>\n ${JSON.stringify(event)}`);
+        if (event) this.junction(); // 临时写法
     }
-
     /**
      *
      * @param beeList : a Population-Summary object
@@ -242,5 +260,6 @@ const ClassComb = class {
     }
 
 };
+
 
 module.exports = ClassComb;

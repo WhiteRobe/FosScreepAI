@@ -1,7 +1,10 @@
 const _ = require('lodash');
+const AIInterface = require('interface.ai');
+const InterfaceCivilian = require('interface.civilian');
 
-class AIHarvesterInterface {
+class AIHarvesterInterface extends AIInterface{
     constructor(){
+        super();
         this.jobList = {
             None : undefined,
             Transfer : 'Transfer',
@@ -92,7 +95,6 @@ class AIHarvesterInterface {
     }
 }
 
-const InterfaceCivilian = require('interface.civilian');
 const DefaultProducer = InterfaceCivilian.DefaultProducer;
 
 /**
@@ -292,4 +294,4 @@ AlwaysHarvester.harvest = function(bee){
 
 module.exports.DefaultHarvester = DefaultHarvester;
 module.exports.IntentHarvester = IntentHarvester;
-module.exports.AlwaysHarvester = IntentHarvester;
+module.exports.AlwaysHarvester = AlwaysHarvester;

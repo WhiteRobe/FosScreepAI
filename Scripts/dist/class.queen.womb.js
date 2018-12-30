@@ -109,13 +109,13 @@ const populationPlan = {
             num : 0
         },
         Transfer :{
-            num : 1
+            num : 0
         },
         Upgrader : {
             num : 0
         },
         Fixer : {
-            num : 1
+            num : 0
         },
         Builder : {
             num : 0

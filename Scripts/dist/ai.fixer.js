@@ -1,8 +1,10 @@
 const _ = require('lodash');
+const AIInterface = require('interface.ai');
 const InterfaceCivilian = require('interface.civilian');
 
-class AIFixerInterface {
+class AIFixerInterface extends AIInterface{
     constructor(){
+        super();
         this.jobList = {
             None : undefined,
             Withdraw : 'Withdraw',
@@ -35,8 +37,12 @@ class AIFixerInterface {
         console.log('Abstract Method:withdraw() in AIFixerInterface.class');
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
     lorry(bee){
-
+        console.log('Abstract Method:lorry() in AIFixerInterface.class');
     }
 
     fix(bee){
@@ -45,7 +51,6 @@ class AIFixerInterface {
 
         if(target && target.hits < target.hitsMax){
             let actionStatus = creep.repair(target);
-            console.log(actionStatus);
             switch (actionStatus) {
                 case ERR_NOT_IN_RANGE:
                     creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
@@ -128,7 +133,7 @@ DefaultFixer.findJob = function(bee){
 
     } else {
         let targets = creep.room.find(FIND_STRUCTURES, {
-            filter: s => s.hits < s.hitsMax
+            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 10 * 1000
         });
         if(targets.length>0){
             targets = _.sortBy(targets, s => s.hits);
@@ -152,8 +157,8 @@ DefaultFixer.withdraw = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
     if(target &&
-        ( target.energy && target.energy < target.energyCapacity // hot-fix spawn or extension
-        || target.store && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
+        ( target.energy!==undefined && target.energy < target.energyCapacity // hot-fix spawn or extension
+        || target.store!==undefined && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
         let energy = creep.room.energyAvailable;
         let capacity = creep.room.energyCapacityAvailable;
         let properWithdrawNum = energy-Math.ceil(0.5 * capacity);

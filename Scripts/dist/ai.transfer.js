@@ -1,7 +1,10 @@
 const _ = require('lodash');
+const AIInterface = require('interface.ai');
+const InterfaceCivilian = require('interface.civilian');
 
-class AITransferInterface {
+class AITransferInterface extends AIInterface{
     constructor(){
+        super();
         this.jobList = {
             None : undefined,
             Pick : 'Pick',
@@ -59,7 +62,7 @@ class AITransferInterface {
 
     run(bee){
         let creep = bee.creep;
-        // console.log(Game.time, JSON.stringify(creep.memory.job));
+        console.log(Game.time, bee.creepName, JSON.stringify(creep.memory.job));
         if(!creep.memory.job){
             // Find an job
             this.findJob(bee);
@@ -86,7 +89,7 @@ class AITransferInterface {
     }
 }
 
-const InterfaceCivilian = require('interface.civilian');
+
 const DefaultProducer = InterfaceCivilian.DefaultProducer;
 
 /**
@@ -249,10 +252,12 @@ DefaultTransfer.withdraw = function(bee){
 DefaultTransfer.transfer = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
+    console.log(target.structureType, target.energy);
     if(target &&
-        ( target.energy && target.energy < target.energyCapacity // hot-fix spawn or extension
-        || target.store && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
+        ( target.energy!==undefined && target.energy < target.energyCapacity // hot-fix spawn or extension
+        || target.store!==undefined && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
         let actionStatus = creep.transfer(target, RESOURCE_ENERGY);
+
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });

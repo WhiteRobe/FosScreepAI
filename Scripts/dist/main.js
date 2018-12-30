@@ -20,7 +20,7 @@ module.exports.loop = function () {
 
 
 function timeSchedule() {
-    if(Game.time % 3 === 0){
+    if(Game.time % 10 === 0){
         console.log(`${Game.time}|log:checkAllBees`);
         queen.checkAllBees();
     }

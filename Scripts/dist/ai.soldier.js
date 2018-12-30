@@ -1,8 +1,10 @@
 const _ = require('lodash');
+const AIInterface = require('interface.ai');
 const InterfaceCivilian = require('interface.civilian');
 
-class AISoldierInterface {
+class AISoldierInterface extends AIInterface{
     constructor(){
+        super();
         this.jobList = {
             None : undefined,
             Retreat : 'Retreat',

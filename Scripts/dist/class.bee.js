@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const MK = require('magic.key');
 
+const AIInterface = require('interface.ai');
 const AIHarvester = require('ai.harvester');
 const AITransfer = require('ai.transfer');
 const AIUpgrader = require('ai.upgrader');
@@ -53,6 +54,7 @@ const ClassBee = class {
     }
 
     set AI(value) {
+        if(value) console.log(`${Game.time}|${this.myComb.combName}: Decide AI [${value.AIName}] for [${this.creepName}].`);
         this._AI = value;
     }
 
@@ -73,7 +75,7 @@ const ClassBee = class {
     run(){
 
         if(!this.isAlive) {
-            // Bee is spawning, no id at this moment
+            // this.myComb.notify({"event":"bee dead"});
             return console.log(`${Game.time}|${this.myComb.combName}:`+
                 `Bee ${this.creepName} is dead or spawning. Waiting next-step...`);
         }
@@ -100,13 +102,13 @@ const ClassBee = class {
             "claim" : 0,
             "tough" : 0
         };
-        let AI = AIHarvester.DefaultHarvester;
+        let AI = new AIInterface();
 
         _.forEach(body, b => parts[b.type] = parts[b.type]+1);
 
         switch (occupation) {
             case MK.ROLE.Harvester.value:
-                if(parts.carry) AI = AIHarvester.AlwaysHarvester;
+                if(parts.carry===0) AI = AIHarvester.AlwaysHarvester;
                 else if(parts.work<5) AI = AIHarvester.DefaultHarvester;
                 else AI = AIHarvester.IntentHarvester;
                 break;
@@ -126,7 +128,7 @@ const ClassBee = class {
                 AI = AISoldier.DefaultSoldier;
                 break;
             default:
-                console.log(`${Game.time}|decideAI:Error unknown-type [${occupation}]`);
+                console.log(`${Game.time}${this.myComb.combName} : Decide AI Error => unknown-type [${occupation}]`);
         }
 
         return AI;

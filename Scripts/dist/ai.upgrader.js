@@ -1,7 +1,9 @@
 const _ = require('lodash');
+const AIInterface = require('interface.ai');
 
-class AIUpgraderInterface {
+class AIUpgraderInterface extends AIInterface{
     constructor(){
+        super();
         this.jobList = {
             None : undefined,
             Withdraw : 'Withdraw',

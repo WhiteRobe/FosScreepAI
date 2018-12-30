@@ -122,8 +122,7 @@ DefaultProducer.findContainerOrStorage = function(bee, reverse=false){
 DefaultProducer.findExtensionOrSpawn = function(bee, reverse=false){
     let resultStoreList = bee.myComb.room.find(FIND_STRUCTURES,
         {
-            filter: s => s.energy < s.energyCapacity
-                && (s.structureType === STRUCTURE_EXTENSION  || s.structureType === STRUCTURE_SPAWN)
+            filter: s => (s.structureType === STRUCTURE_EXTENSION  || s.structureType === STRUCTURE_SPAWN)
                 && s.energy < s.energyCapacity
         }
     );

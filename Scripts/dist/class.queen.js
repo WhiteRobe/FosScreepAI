@@ -83,7 +83,7 @@ const ClassQueen = class {
         if(callback){
             callback();
         } else {
-            console.log(`${Game.time}|${this.homeRoom}:Queen is awake!`);
+            console.log(`${Game.time}|${this.homeRoom}: Queen is awake!`);
         }
     }
 
