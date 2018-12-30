@@ -61,7 +61,7 @@ const ClassBee = class {
     */
     get isAlive(){
         this.creep = Game.creeps[this.creepName]; // Refresh-Creep-Data
-        console.log('isAlive',this.creep);
+        //console.log('isAlive',this.creep);
         return this.creep!==undefined;
     }
 

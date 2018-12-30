@@ -115,7 +115,7 @@ const populationPlan = {
             num : 0
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
             num : 0
@@ -286,7 +286,7 @@ function decideType(comb, occupation) {
             }
             break;
         case MK.ROLE.Fixer.value:
-            result.part = [CARRY, CARRY, MOVE];
+            result.part = [WORK, CARRY, MOVE];
             break;
         case MK.ROLE.Soldier.value:
             if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
