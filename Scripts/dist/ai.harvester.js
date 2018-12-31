@@ -242,10 +242,10 @@ AlwaysHarvester.findJob = function(bee){
         let target = DefaultProducer.findSource(bee); // @see interface.civilian
         if(target){
             let containers = target.room.lookForAtArea(LOOK_STRUCTURES,
-                target.pos.y-1,target.pos.x-1,target.pos.y+1,target.pos.x+1);
-            containers = _.filter(containers, c => c.structureType === STRUCTURE_CONTAINER);
-            if(containers.length>0){
-                creep.memory.containerPos = containers[0].id;
+                target.pos.y-1,target.pos.x-1,target.pos.y+1,target.pos.x+1, true);
+            containers = _.filter(containers,  c => c.structure && c.structure.structureType === STRUCTURE_CONTAINER);
+            if(containers.length>0){ // Note: containers-array like , {type:"xxx", structure:{...}}
+                creep.memory.containerPos = containers[0].structure.id;
             }
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Harvest;

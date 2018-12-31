@@ -1,5 +1,6 @@
+const Bee = require('class.bee');
 const Comb = require('class.comb');
-const Womb = require('class.queen.womb');
+const Womb = require('class.womb');
 const Mind = require('class.queen.mind');
 
 const _ = require('lodash');
@@ -21,7 +22,9 @@ const ClassQueen = class {
         this._homeShard = homeShard;
         this._homeRoom = homeRoom;
 
+        this.homeComb = undefined;
         this.combs = []; // Combs under queen's/your control
+        this.bees = [];
         this.queenIsAvaliable = false; // If the queen is ready to control your bees(creeps)
 
         this.buildBody();
@@ -56,8 +59,8 @@ const ClassQueen = class {
     * This function will be called when ClassQueen is built
     */
     buildBody(){
-        this.womb = new Womb(); // An organ to produce new bees
-        this.mind = new Mind(); // An organ to control your queen
+        this.womb = new Womb.ClassQueenWomb(); // An organ to produce new bees
+        this.mind = new Mind(this); // An organ to control your queen
     }
 
     /**
@@ -65,6 +68,24 @@ const ClassQueen = class {
     * But at first, queen need to find all of her combs/room
     * */
     junction(callback){
+
+        this.findMyCombs();
+
+        this.findMyBees();
+
+        this.queenIsAvaliable = true;
+
+        if(callback){
+            callback();
+        } else {
+            console.log(`${Game.time}|${this.homeRoom}: Queen is awake!`);
+        }
+    }
+
+    /**
+     *Find combs belong to this queen
+     */
+    findMyCombs(){
         this.combs = [];
         for(let r in Game.rooms){
             // Game.rooms contains a map of rooms which your creep is present
@@ -76,29 +97,59 @@ const ClassQueen = class {
                 let newComb = new Comb(room, this); // Wrapper this room.class to comb.class
                 newComb.junction(); // Active this comb
                 this.combs.push(newComb); // Make it under your queen's control
+                if(newComb.combName === this.homeRoom){
+                    this.homeComb = newComb;
+                }
             }
         }
 
-        this.queenIsAvaliable = true;
-        if(callback){
-            callback();
-        } else {
-            console.log(`${Game.time}|${this.homeRoom}: Queen is awake!`);
+        if(this.homeComb===undefined){
+            console.log(`${Game.time}|${this.combName}: Queen has lost her room. Find another room for her!`);
+        }
+    }
+
+    /**
+     *Find bees belong to this queen
+     */
+    findMyBees(){
+        this.bees = [];
+        for(let c in Game.creeps){
+            let creep = Game.creeps[c];
+
+            if(creep.memory.queenDirectly){
+                this.bees.push(new Bee(creep, this.homeComb));
+                console.log(`${Game.time}|${this.homeComb.combName}: Find Queen's Bee [${creep.name}], memory is \n`+
+                    `${JSON.stringify(creep.memory)}!`);
+            }
         }
     }
 
 
     doCommand(plan){
-        // Control your empire
+        // 1. Queen will think what next to do
+        this.mind.think();
+        // 2. Control your empire
         _.forEach(this.combs, comb => comb.run());
+        // 3. Control the bees belong to queen
+        _.forEach(this.bees, bee => bee.run());
     }
+
 
     checkAllBees(){
         _.forEach(this.combs, comb => comb.checkBees());
+
+        // Check Directly-Bee's Status
+        _.forEach(this.bees, bee => {
+            if (!bee.isAlive) {
+                console.log(`${Game.time}|${bee.myComb.combName}:Clean dead-body ${bee.creepName}`);
+                delete Memory.creeps[bee.creepName]; // clean dead bees
+            }
+        });
     }
 
-    oviposit(){
+    oviposit(beeInfo){
         // this.womb.oviposit(); // Delegate
+        return this.womb.oviposit(this.homeComb, beeInfo);
     }
 
     notify(event, callback){

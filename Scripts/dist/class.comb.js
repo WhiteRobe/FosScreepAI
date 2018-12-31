@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const Bee = require('class.bee');
 const BeeStructure = require('class.beestructure');
+const Womb = require('class.womb');
 const MK = require('magic.key');
 
 /**
@@ -25,6 +26,7 @@ const ClassComb = class {
         this.structures = []; // A array store your structures belong to this comb(store by object.id)
 
         this.combIsAvaliable = false;
+        this.womb = new Womb.ClassCombWomb();
 
         // this.junction();
     };
@@ -134,6 +136,7 @@ const ClassComb = class {
      */
     addBee(newBee){
         newBee.myComb = this;
+        console.log(`${Game.time}|${this.combName}: AddBee ${newBee.creepName}`);
         this.bees.push(newBee);
     }
 
@@ -249,14 +252,13 @@ const ClassComb = class {
         console.log(`${Game.time}|${this.combName}:Event-Attach =>\n ${JSON.stringify(event)}`);
         if (event) this.junction(); // 临时写法
     }
+
     /**
      *
      * @param beeList : a Population-Summary object
      */
     oviposit(beeList){
-        let womb = this.myQueen.womb;
-
-        womb.oviposit(this, beeList);
+        this.womb.oviposit(this, beeList);
     }
 
 };

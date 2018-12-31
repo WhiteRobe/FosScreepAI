@@ -125,7 +125,10 @@ const ClassBee = class {
                 AI = AIFixer.DefaultFixer;
                 break;
             case MK.ROLE.Soldier.value:
-                AI = AISoldier.DefaultSoldier;
+                if(!this.creep.memory.profession) AI = AISoldier.DefaultSoldier;
+                else if(this.creep.memory.profession === 'RemoteAttack') AI = AISoldier.RemoteSwordSoldier; // MagicKey link to class.queen.mind remain to fix
+                else if(this.creep.memory.profession === 'Reserve') AI = AISoldier.ReserveSoldier;
+                else AI = AISoldier.DefaultSoldier;
                 break;
             default:
                 console.log(`${Game.time}${this.myComb.combName} : Decide AI Error => unknown-type [${occupation}]`);
