@@ -54,7 +54,10 @@ const ClassBee = class {
     }
 
     set AI(value) {
-        if(value) console.log(`${Game.time}|${this.myComb.combName}: Decide AI [${value.AIName}] for [${this.creepName}].`);
+        if(value) {
+            console.log(`${Game.time}|${this.myComb.combName}: Decide AI [${value.AIName}] for [${this.creepName}].`);
+            this.creep.memory.AI = value.AIName;
+        }
         this._AI = value;
     }
 
@@ -122,7 +125,8 @@ const ClassBee = class {
                 AI = AIBuilder.DefaultBuilder;
                 break;
             case MK.ROLE.Fixer.value:
-                AI = AIFixer.DefaultFixer;
+                if(parts.carry===1) AI = AIFixer.DefaultFixer;
+                else AI = AIFixer.LorryFixer;
                 break;
             case MK.ROLE.Soldier.value:
                 if(!this.creep.memory.profession) AI = AISoldier.DefaultSoldier;

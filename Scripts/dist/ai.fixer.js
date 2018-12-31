@@ -37,12 +37,33 @@ class AIFixerInterface extends AIInterface{
         console.log('Abstract Method:withdraw() in AIFixerInterface.class');
     }
 
-    /**
-     * Abstract
-     * @param bee
-     */
     lorry(bee){
-        console.log('Abstract Method:lorry() in AIFixerInterface.class');
+        let creep = bee.creep;
+        let target = Game.getObjectById(creep.memory.target); // CONSTRUCTION_SITES
+        if(target && target.energy < target.energyCapacity){
+            let actionStatus = creep.transfer(target,RESOURCE_ENERGY);
+            switch (actionStatus) {
+                case ERR_NOT_IN_RANGE:
+                    creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
+                    creep.say("⚡ 准备充能!");
+                    break;
+                case OK:
+                    if(creep.carry.energy <= 0){
+                        delete creep.memory.target;
+                        this.findJob(bee);
+                    }
+                    break;
+                default:
+                    // Job done or was valid
+                    delete creep.memory.target;
+                    this.findJob(bee);
+                //creep.memory.job = this.jobList.None;
+
+            }
+        } else {
+            delete creep.memory.target;
+            this.findJob(bee);
+        }
     }
 
     fix(bee){
@@ -134,7 +155,7 @@ DefaultFixer.findJob = function(bee){
 
     } else {
         let targets = creep.room.find(FIND_STRUCTURES, {
-            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 10 * 1000
+            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 11 * 1000
         });
         if(targets.length>0){
             targets = _.sortBy(targets, s => s.hits);
@@ -187,22 +208,71 @@ DefaultFixer.withdraw = function(bee){
     }
 };
 
-DefaultFixer.lorry = function(bee){
+
+const LorryFixer = new AIFixerInterface();
+LorryFixer.AIName = "LorryFixer";
+
+LorryFixer.findJob = function(bee){
     let creep = bee.creep;
-    let target = Game.getObjectById(creep.memory.target); // CONSTRUCTION_SITES
-    if(target && target.energy < target.energyCapacity){
-        let actionStatus = creep.transfer(target,RESOURCE_ENERGY);
+    creep.say("🕗 找工作中");
+    if(creep.carry.energy <= 0){
+        let target = creep.room.storage;
+        if(target){
+            creep.memory.job = this.jobList.Withdraw;
+            creep.memory.target = target.id;
+            return;
+        }
+
+        target =  DefaultConsumer.findClosestEnergyStorage(bee);
+
+        if(target){
+            creep.memory.job = this.jobList.Withdraw;
+            creep.memory.target = target.id;
+            return;
+        }
+
+    } else {
+
+        let targets = creep.room.find(FIND_STRUCTURES, {
+            filter: s => s.structureType === STRUCTURE_TOWER && s.energy <= s.energyCapacity - 50
+        });
+        if(targets.length>0){
+            creep.memory.job = this.jobList.Lorry;
+            creep.memory.target = targets[0].id;
+            return ;
+        }
+
+        targets = creep.room.find(FIND_STRUCTURES, {
+            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 15 * 1000
+        });
+        if(targets.length>0){
+            targets = _.sortBy(targets, s => s.hits);
+            creep.memory.job = this.jobList.Fix;
+            creep.memory.target = targets[0].id;
+
+        }
+
+        creep.say('🌙 休息中.');
+    }
+};
+
+LorryFixer.withdraw = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+    if(target &&
+        ( target.energy!==undefined && target.energy < target.energyCapacity // hot-fix spawn or extension
+            || target.store!==undefined && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
+        let energy = creep.room.energyAvailable;
+        let capacity = creep.room.energyCapacityAvailable;
+        let properWithdrawNum = energy-Math.ceil(0.5 * capacity);
+        let actionStatus = creep.withdraw(target, RESOURCE_ENERGY,
+            Math.min(properWithdrawNum, creep.carryCapacity)-creep.carry[RESOURCE_ENERGY]);
         switch (actionStatus) {
             case ERR_NOT_IN_RANGE:
                 creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
-                creep.say("⚡ 准备充能!");
+                creep.say("🧀 获取资源!");
                 break;
             case OK:
-                if(creep.carry.energy <= 0){
-                    delete creep.memory.target;
-                    this.findJob(bee);
-                }
-                break;
             default:
                 // Job done or was valid
                 delete creep.memory.target;
@@ -210,10 +280,14 @@ DefaultFixer.lorry = function(bee){
             //creep.memory.job = this.jobList.None;
 
         }
+        // console.log('UpgraderLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, target.structureType);
     } else {
+        // Job is valid
         delete creep.memory.target;
         this.findJob(bee);
+        //creep.memory.job = this.jobList.None;
     }
 };
 
 module.exports.DefaultFixer = DefaultFixer;
+module.exports.LorryFixer = LorryFixer;

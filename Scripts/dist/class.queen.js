@@ -136,15 +136,20 @@ const ClassQueen = class {
 
 
     checkAllBees(){
+        // Command all-combs to check Bee's Status
         _.forEach(this.combs, comb => comb.checkBees());
 
+        let beesAlive = [];
         // Check Directly-Bee's Status
         _.forEach(this.bees, bee => {
             if (!bee.isAlive) {
                 console.log(`${Game.time}|${bee.myComb.combName}:Clean dead-body ${bee.creepName}`);
                 delete Memory.creeps[bee.creepName]; // clean dead bees
+            } else {
+                beesAlive.push(bee);
             }
         });
+        this.bees = beesAlive; // Save all alive bees
     }
 
     oviposit(beeInfo){
