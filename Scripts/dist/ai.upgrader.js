@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const AIInterface = require('interface.ai');
+const InterfaceCivilian = require('interface.civilian');
+const DefaultConsumer = InterfaceCivilian.DefaultConsumer;
 
 class AIUpgraderInterface extends AIInterface{
     constructor(){
@@ -86,8 +88,6 @@ class AIUpgraderInterface extends AIInterface{
     }
 }
 
-const InterfaceCivilian = require('interface.civilian');
-const DefaultConsumer = InterfaceCivilian.DefaultConsumer;
 
 /**
  * DefaultUpgrader always try to upgrade controller,

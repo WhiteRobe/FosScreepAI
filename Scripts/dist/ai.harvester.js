@@ -111,10 +111,11 @@ DefaultHarvester.AIName = "DefaultHarvester";
 DefaultHarvester.findJob = function (bee) {
     let creep = bee.creep;
     creep.say("🕗 找工作中");
+
     if(creep.carry.energy >= creep.carryCapacity){
-        let target = DefaultProducer.findExtensionOrSpawn(bee, false); // extension first
-        if(target){
-            creep.memory.target = target.id;
+        let targetList = DefaultProducer.findExtensionOrSpawn(bee, false); // extension first
+        if(targetList.length>0){
+            creep.memory.target = targetList[0].id;
             creep.memory.job = this.jobList.Transfer;
         } else {
             creep.say("❌ 等待存储点...");
@@ -169,7 +170,7 @@ DefaultHarvester.transfer = function (bee) {
             creep.memory.job = this.jobList.None;
             delete creep.memory.target;
         }
-        console.log('HarvesterLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.memory), actionStatus, target.structureType);
+        //console.log('HarvesterLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.memory), actionStatus, target.structureType);
     } else {
         // Job is valid
         creep.memory.job = this.jobList.None;

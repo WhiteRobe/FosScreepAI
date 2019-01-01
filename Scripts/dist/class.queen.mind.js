@@ -104,7 +104,7 @@ const ClassQueenMind = class {
             if(transferRoomName){
                 if(this.queen.homeComb.room.energyAvailable > 1000){
                     let status = this.queen.oviposit({
-                        part:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], // 550 energy
+                        part:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], // 600 energy
                         memory:{
                             queenDirectly: true,
                             myCombName: 'queen',

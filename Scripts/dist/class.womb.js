@@ -231,7 +231,7 @@ const populationPlan = {
             num : 0
         },
         Builder : {
-            num : 1
+            num : 0
         },
         Soldier :{
             num : 0
@@ -275,7 +275,7 @@ const populationPlan = {
             num : 1
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0

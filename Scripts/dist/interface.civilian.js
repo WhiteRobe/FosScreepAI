@@ -9,6 +9,10 @@ class ConsumerInterface{
 
     }
 
+    findEnergyStorageOrContainer(bee, reverse=false){
+
+    }
+
 
     /**
      * Behavior : Find Mineral Storage
@@ -163,6 +167,23 @@ DefaultConsumer.findClosestEnergyStorage = function(bee){
 
 };
 
+DefaultConsumer.findEnergyStorageOrContainer = function(bee, reverse=false){
+    let creep = bee.creep;
+
+    let targetList = creep.room.find(FIND_STRUCTURES, {
+        filter : s => s.structureType === STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] > 0
+    });
+
+    if(creep.room.storage && creep.room.storage.store[RESOURCE_ENERGY]>0){
+        if(reverse){
+            targetList.push(creep.room.storage);
+        } else {
+            targetList.unshift(creep.room.storage);
+        }
+    }
+
+    return targetList;
+};
 
 
 module.exports.ConsumerInterface = ConsumerInterface;

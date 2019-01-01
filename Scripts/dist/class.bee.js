@@ -79,8 +79,8 @@ const ClassBee = class {
 
         if(!this.isAlive) {
             // this.myComb.notify({"event":"bee dead"});
-            return console.log(`${Game.time}|${this.myComb.combName}:`+
-                `Bee ${this.creepName} is dead or spawning. Waiting next-step...`);
+            return console.log(`${Game.time}|${this.myComb.combName}: `+
+                `Bee ${this.creepName} is dead . Waiting for being cleaned...`);
         }
 
 

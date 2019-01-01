@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const AIInterface = require('interface.ai');
 const InterfaceCivilian = require('interface.civilian');
+const DefaultConsumer = InterfaceCivilian.DefaultConsumer;
 
 class AITransferInterface extends AIInterface{
     constructor(){
@@ -329,35 +330,11 @@ RemoteTransfer.findJob = function(bee){
             return;
         }
 
-        let target = undefined;
+        let targetList = DefaultConsumer.findEnergyStorageOrContainer(bee);
 
-        // Else, find container that is around the energy-source
-        let containers = [];
-
-        _.forEach(bee.myComb.resources.sources, source => {
-            let sp = source.pos;
-            containers = _.union(containers, creep.room.lookForAtArea(
-                LOOK_STRUCTURES,sp.y-1, sp.x-1, sp.y+1, sp.x+1, true)
-            );
-
-        });
-
-        containers = _.filter(containers,
-            s => s.structure && s.structure.structureType === STRUCTURE_CONTAINER
-                && s.structure.store[RESOURCE_ENERGY] > 0
-        );
-        containers = _.map(containers, s => s.structure);
-
-        if(containers.length > 0){
-            containers = _.sortBy(containers, s => // Order by Manhattan-distance(L1)
-                Math.abs(creep.pos.x-s.pos.x) + Math.abs(creep.pos.y-s.pos.y)
-            );
-            target = containers[0];
-        }
-
-        if(target){
+        if(targetList.length>0){
             creep.memory.job = this.jobList.Withdraw;
-            creep.memory.target = target.id;
+            creep.memory.target = targetList[0].id;
             return;
         }
 
