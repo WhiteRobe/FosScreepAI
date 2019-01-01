@@ -258,6 +258,7 @@ const ClassComb = class {
      * @param beeList : a Population-Summary object
      */
     oviposit(beeList){
+        this.room = Game.rooms[this.room.name]; // refresh room's status -- Hot-fix
         this.womb.oviposit(this, beeList);
     }
 

@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const AIInterface = require('interface.ai');
 const InterfaceCivilian = require('interface.civilian');
+const DefaultConsumer = InterfaceCivilian.DefaultConsumer;
 
 class AIFixerInterface extends AIInterface{
     constructor(){

@@ -92,7 +92,8 @@ DefaultProducer.findSource = function(bee){
     let creep = bee.creep;
     let sources = bee.myComb.resources.sources;
     if(creep.pos.findInRange(FIND_MY_SPAWNS,1).length >0){
-        sources = _.sortByOrder(sources,['mount'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
+        sources = _.sortByOrder(sources,['energy'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
+
     } else {
         sources = _.sortBy(sources, r =>
             Math.abs(creep.pos.x - r.pos.x) + Math.abs(creep.pos.y - r.pos.y)
@@ -190,3 +191,4 @@ module.exports.ConsumerInterface = ConsumerInterface;
 module.exports.ProducerInterface = ProducerInterface;
 module.exports.DefaultConsumer = DefaultConsumer;
 module.exports.DefaultProducer = DefaultProducer;
+

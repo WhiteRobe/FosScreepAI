@@ -143,7 +143,7 @@ function decideType(comb, occupation) {
             }
             break;
         case MK.ROLE.Transfer.value:
-            if(roomLevel===1) result.part = [CARRY, CARRY, MOVE];
+            if(roomLevel<=2) result.part = [CARRY, CARRY, MOVE];
             else{
                 if(roomEnergy>=300) result.part = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
                 else result.part = [CARRY, CARRY, MOVE];
@@ -241,7 +241,7 @@ const populationPlan = {
         // energyCapacity : 300 + 5 * 50
         level:2,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
             num : 1
