@@ -9,6 +9,7 @@ class AIBuilderInterface extends AIInterface{
             None : undefined,
             Withdraw : 'Withdraw',
             Upgrade: 'Upgrade',
+            March : 'March',
             Build : 'Build'
         };
 
@@ -69,6 +70,13 @@ class AIBuilderInterface extends AIInterface{
         }
     }
 
+    /**
+     * Abstract
+     * @param bee
+     */
+    march(bee){
+        console.log('Abstract Method:upgrade() in AIBuilderInterface.class');
+    }
 
     build(bee){
         let creep = bee.creep;
@@ -122,6 +130,9 @@ class AIBuilderInterface extends AIInterface{
                     break;
                 case this.jobList.Upgrade:
                     this.upgrade(bee);
+                    break;
+                case this.jobList.March:
+                    this.march(bee);
                     break;
                 case this.jobList.Build:
                     this.build(bee);
@@ -199,4 +210,102 @@ DefaultBuilder.withdraw = function(bee){
     }
 };
 
+const RemoteBuilder = new AIBuilderInterface();
+RemoteBuilder.AIName = "RemoteBuilder";
+
+RemoteBuilder.findJob = function(bee){
+    let creep = bee.creep;
+    creep.say("🕗 找工作中");
+    if(creep.carry.energy <= 0){
+
+        if(creep.room.name !== creep.memory.homeRoomName){ // Go back
+            creep.memory.job = this.jobList.March;
+            creep.memory.marchTarget = creep.memory.homeRoomName;
+            return;
+        }
+
+        let target = creep.room.storage;
+        if(target){
+            creep.memory.job = this.jobList.Withdraw;
+            creep.memory.target = target.id;
+            return;
+        }
+
+        target =  DefaultConsumer.findClosestEnergyStorage(bee);
+
+        if(target){
+            creep.memory.job = this.jobList.Withdraw;
+            creep.memory.target = target.id;
+            return;
+        }
+    } else {
+        if(creep.room.name !== creep.memory.targetRoomName){ // Go to remote room
+            creep.memory.job = this.jobList.March;
+            creep.memory.marchTarget = creep.memory.targetRoomName;
+            return;
+        }
+
+        let constructionSite = creep.pos.findClosestByRange(FIND_CONSTRUCTION_SITES);
+        if(constructionSite){
+            creep.memory.job = this.jobList.Build;
+            creep.memory.target = constructionSite.id;
+        } else { // If there is no build-task, turn to upgrade controller
+            creep.memory.job = this.jobList.Upgrade;
+            creep.say('📢 进行升级任务');
+        }
+    }
+};
+
+RemoteBuilder.march = function(bee){
+    let creep = bee.creep;
+    let targetRoom = new RoomPosition(25, 25, creep.memory.marchTarget); // RoomPosition use roomName instead of name
+    if(targetRoom){
+        let actionStatus =
+            creep.moveTo(targetRoom, {visualizePathStyle: this.visualizePathStyle});
+        switch (actionStatus) {
+            default:
+                if(creep.room.name === targetRoom.roomName){
+                    creep.say("⚜️ 到达目标");
+                    this.findJob(bee);
+                } else{
+                    creep.say("🚇 行军中");
+                }
+        }
+    } else{
+        this.findJob(bee);
+    }
+};
+
+RemoteBuilder.withdraw = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+    if(target){
+        let energy = creep.room.energyAvailable;
+        let capacity = creep.room.energyCapacityAvailable;
+        let properWithdrawNum = energy-Math.ceil(0.5 * capacity);
+        let actionStatus = creep.withdraw(target, RESOURCE_ENERGY,
+            Math.min(properWithdrawNum, creep.carryCapacity)-creep.carry[RESOURCE_ENERGY]);
+        switch (actionStatus) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
+                creep.say("🧀 获取资源!");
+                break;
+            case OK:
+            default:
+                // Job done or was valid
+                delete creep.memory.target;
+                this.findJob(bee);
+            //creep.memory.job = this.jobList.None;
+
+        }
+        // console.log('UpgraderLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, target.structureType);
+    } else {
+        // Job is valid
+        delete creep.memory.target;
+        this.findJob(bee);
+        //creep.memory.job = this.jobList.None;
+    }
+};
+
 module.exports.DefaultBuilder = DefaultBuilder;
+module.exports.RemoteBuilder = RemoteBuilder;

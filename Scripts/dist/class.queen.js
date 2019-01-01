@@ -118,8 +118,8 @@ const ClassQueen = class {
 
             if(creep.memory.queenDirectly){
                 this.bees.push(new Bee(creep, this.homeComb));
-                console.log(`${Game.time}|${this.homeComb.combName}: Find Queen's Bee [${creep.name}], memory is \n`+
-                    `${JSON.stringify(creep.memory)}!`);
+                //console.log(`${Game.time}|${this.homeComb.combName}: Find Queen's Bee [${creep.name}], memory is \n`+
+                //    `${JSON.stringify(creep.memory)}!`);
             }
         }
     }
@@ -143,7 +143,7 @@ const ClassQueen = class {
         // Check Directly-Bee's Status
         _.forEach(this.bees, bee => {
             if (!bee.isAlive) {
-                console.log(`${Game.time}|${bee.myComb.combName}:Clean dead-body ${bee.creepName}`);
+                console.log(`${Game.time}|${bee.myComb.combName}: [Queen]Clean dead-body ${bee.creepName}`);
                 delete Memory.creeps[bee.creepName]; // clean dead bees
             } else {
                 beesAlive.push(bee);

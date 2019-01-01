@@ -116,13 +116,15 @@ const ClassBee = class {
                 else AI = AIHarvester.IntentHarvester;
                 break;
             case MK.ROLE.Transfer.value:
-                AI = AITransfer.DefaultTransfer;
+                if(!this.creep.memory.profession) AI = AITransfer.DefaultTransfer;
+                else if(this.creep.memory.profession === 'RemoteTransfer') AI = AITransfer.RemoteTransfer;
                 break;
             case MK.ROLE.Upgrader.value:
                 AI = AIUpgrader.DefaultUpgrader;
                 break;
             case MK.ROLE.Builder.value:
-                AI = AIBuilder.DefaultBuilder;
+                if(!this.creep.memory.profession) AI = AIBuilder.DefaultBuilder;
+                else if(this.creep.memory.profession === 'RemoteBuild') AI = AIBuilder.RemoteBuilder;
                 break;
             case MK.ROLE.Fixer.value:
                 if(parts.carry===1) AI = AIFixer.DefaultFixer;
@@ -132,6 +134,7 @@ const ClassBee = class {
                 if(!this.creep.memory.profession) AI = AISoldier.DefaultSoldier;
                 else if(this.creep.memory.profession === 'RemoteAttack') AI = AISoldier.RemoteSwordSoldier; // MagicKey link to class.queen.mind remain to fix
                 else if(this.creep.memory.profession === 'Reserve') AI = AISoldier.ReserveSoldier;
+                else if(this.creep.memory.profession === 'Claim') AI = AISoldier.ClaimSoldier;
                 else AI = AISoldier.DefaultSoldier;
                 break;
             default:

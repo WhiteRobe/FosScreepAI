@@ -43,7 +43,7 @@ const ClassQueenMind = class {
             if(reserveRoomName){
                 if(this.queen.homeComb.room.energyAvailable > 1500){
                     let status = this.queen.oviposit({
-                        part:[CLAIM, MOVE], // 420 energy
+                        part:[CLAIM, MOVE], // 650 energy
                         memory:{
                             queenDirectly: true,
                             myCombName: 'Queen',
@@ -54,6 +54,68 @@ const ClassQueenMind = class {
                     });
                     if(status === OK){
                         delete Memory.plan.reserveRoomName;
+                    }
+                }
+            }
+
+            // 将一个房间设为占领
+            let claimRoomName = plan.claimRoomName;
+            if(claimRoomName){
+                if(this.queen.homeComb.room.energyAvailable > 1500){
+                    let status = this.queen.oviposit({
+                        part:[CLAIM, MOVE], // 650 energy
+                        memory:{
+                            queenDirectly: true,
+                            myCombName: 'Queen',
+                            targetRoomName: claimRoomName,
+                            occupation: MK.ROLE.Soldier.value,
+                            profession: 'Claim'
+                        }
+                    });
+                    if(status === OK){
+                        delete Memory.plan.claimRoomName;
+                    }
+                }
+            }
+
+            // 前往一个房间建造
+            let buildRoomName = plan.buildRoomName;
+            if(buildRoomName){
+                if(this.queen.homeComb.room.energyAvailable > 1200){
+                    let status = this.queen.oviposit({
+                        part:[WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE], // 700 energy
+                        memory:{
+                            queenDirectly: true,
+                            myCombName: 'queen',
+                            homeRoomName: this.queen.homeRoom,
+                            targetRoomName: buildRoomName,
+                            occupation: MK.ROLE.Builder.value,
+                            profession: 'RemoteBuild'
+                        }
+                    });
+                    if(status === OK){
+                        delete Memory.plan.buildRoomName;
+                    }
+                }
+            }
+
+            // 运送能源前往另一个房间
+            let transferRoomName = plan.transferRoomName;
+            if(transferRoomName){
+                if(this.queen.homeComb.room.energyAvailable > 1000){
+                    let status = this.queen.oviposit({
+                        part:[CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE], // 550 energy
+                        memory:{
+                            queenDirectly: true,
+                            myCombName: 'queen',
+                            homeRoomName: this.queen.homeRoom,
+                            targetRoomName: transferRoomName,
+                            occupation: MK.ROLE.Transfer.value,
+                            profession: 'RemoteTransfer'
+                        }
+                    });
+                    if(status === OK){
+                        delete Memory.plan.transferRoomName;
                     }
                 }
             }

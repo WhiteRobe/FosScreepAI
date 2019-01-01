@@ -28,7 +28,7 @@ const ClassCombWomb = class extends WombInterface{
         let plan = populationPlan[comb.room.controller.level]; // Find plan of this room level
         let numOfSpawnInThisComb = comb.spawns.length;
         if(numOfSpawnInThisComb === 0){
-            return console.log(`${Game.time}|${comb.combName}:Comb does's have any SPAWN!`);
+            return console.log(`${Game.time}|${comb.combName}: Comb does's have any SPAWN!`);
         }
         let spawnsIndexFrom = 0;
 
@@ -78,7 +78,7 @@ const ClassQueenWomb = class extends WombInterface{
 
         let numOfSpawnInThisComb = comb.spawns.length;
         if(numOfSpawnInThisComb === 0){
-            return console.log(`${Game.time}|${comb.combName}:Comb does's have any SPAWN!`);
+            return console.log(`${Game.time}|${comb.combName}: Queen's home-comb does's have any SPAWN!`);
         }
         let spawnsIndexFrom = 0;
 
@@ -231,7 +231,7 @@ const populationPlan = {
             num : 0
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0

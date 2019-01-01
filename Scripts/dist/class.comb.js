@@ -110,8 +110,8 @@ const ClassComb = class {
 
             if(creep.memory.myCombName === this.combName){
                 this.bees.push(new Bee(creep, this));
-                console.log(`${Game.time}|${this.combName}: Find Bee [${creep.name}], memory is \n`+
-                    `${JSON.stringify(creep.memory)}!`);
+                //console.log(`${Game.time}|${this.combName}: Find Bee [${creep.name}], memory is \n`+
+                //    `${JSON.stringify(creep.memory)}!`);
             }
         }
     }
@@ -126,7 +126,7 @@ const ClassComb = class {
         });
         _.forEach(targetStructures, s => {
             this.structures.push(new BeeStructure(s, this));
-            console.log(`${Game.time}|${this.combName}: Find Structure [${s.structureType}:${s.id}]!`);
+            //console.log(`${Game.time}|${this.combName}: Find Structure [${s.structureType}:${s.id}]!`);
         })
     }
 
@@ -199,7 +199,7 @@ const ClassComb = class {
 
         _.forEach(this.bees, bee =>{
             if(!bee.isAlive){
-                console.log(`${Game.time}|${bee.myComb.combName}:Clean dead-body ${bee.creepName}`);
+                console.log(`${Game.time}|${bee.myComb.combName}: [Comb]Clean dead-body ${bee.creepName}`);
                 delete Memory.creeps[bee.creepName]; // clean dead bees
             } else {
                 beesAlive.push(bee);

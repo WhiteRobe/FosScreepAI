@@ -204,6 +204,52 @@ ReserveSoldier.reserve = function(bee){
 
 };
 
+const ClaimSoldier = new AISoldierInterface();
+ClaimSoldier.AIName = "ClaimSoldier";
+
+ClaimSoldier.findJob = function(bee){
+    let creep = bee.creep;
+    creep.say("🕗 寻找控制器");
+    if(creep.room.name !== creep.memory.targetRoomName){
+        creep.memory.job = this.jobList.March;
+    } else {
+        creep.memory.job = this.jobList.Claim;
+    }
+};
+
+ClaimSoldier.claim = function(bee){
+    let creep = bee.creep;
+    let targetRoom = Game.rooms[creep.memory.targetRoomName];
+    if(targetRoom){
+        if(targetRoom.controller) {
+            let actionStatus = creep.claimController(creep.room.controller);
+            switch (actionStatus) {
+                case ERR_NOT_IN_RANGE:
+                    creep.moveTo(targetRoom.controller, {visualizePathStyle: this.visualizePathStyle});
+                    creep.say("🗝️ 前往控制器!");
+                    break;
+                case ERR_INVALID_ARGS:
+                    creep.say("❌ 请看日志!");
+                    console.log(`${Game.time}|${targetRoom.name}: The target is not a valid neutral controller object.`);
+                    break;
+                case ERR_NO_BODYPART:
+                    creep.say("❌ 没有转化器!");
+                    break;
+                case OK:
+                    //creep.say(`⚙️ 进度:${targetRoom.controller.reservation.ticksToEnd}`);
+                    creep.say(`🚩 占领中!`,true);
+                    break;
+                default:
+                    this.findJob(bee);
+            }
+        }
+    } else {
+        this.findJob(bee);
+    }
+
+};
+
 module.exports.DefaultSoldier = DefaultSoldier;
 module.exports.RemoteSwordSoldier = RemoteSwordSoldier;
 module.exports.ReserveSoldier = ReserveSoldier;
+module.exports.ClaimSoldier = ClaimSoldier;
