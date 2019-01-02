@@ -128,7 +128,7 @@ function decideType(comb, occupation) {
 
     switch (occupation) {
         case MK.ROLE.Harvester.value:
-            if(roomLevel===1) result.part = [WORK, CARRY, MOVE];
+            if(roomLevel <= 2) result.part = [WORK, CARRY, MOVE];
             else if(roomEnergy/roomEnergyCapacity>0.5 && 300<=roomEnergy && roomEnergy<400){
                 result.part = [WORK, WORK, CARRY, MOVE];
             }
@@ -244,7 +244,7 @@ const populationPlan = {
             num : 2
         },
         Transfer :{
-            num : 1
+            num : 0
         },
         Upgrader : {
             num : 1

@@ -22,9 +22,9 @@ const ClassQueen = class {
         this._homeShard = homeShard;
         this._homeRoom = homeRoom;
 
-        this.homeComb = undefined;
+        this.homeComb = undefined; // @param{ClassComb}
         this.combs = []; // Combs under queen's/your control
-        this.bees = [];
+        this.bees = []; // Bees under queen's/your directly-control
         this.queenIsAvaliable = false; // If the queen is ready to control your bees(creeps)
 
         this.buildBody();
@@ -98,7 +98,7 @@ const ClassQueen = class {
                 newComb.junction(); // Active this comb
                 this.combs.push(newComb); // Make it under your queen's control
                 if(newComb.combName === this.homeRoom){
-                    this.homeComb = newComb;
+                    this.homeComb = newComb; // Find my homeComb
                 }
             }
         }
@@ -153,7 +153,9 @@ const ClassQueen = class {
     }
 
     oviposit(beeInfo){
-        // this.womb.oviposit(); // Delegate
+        // refresh room's status -- Hot-fix
+        this.homeComb.spawns = _.map(this.homeComb.spawns, s => Game.spawns[s.name]);
+
         return this.womb.oviposit(this.homeComb, beeInfo);
     }
 

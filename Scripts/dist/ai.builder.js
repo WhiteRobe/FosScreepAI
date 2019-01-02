@@ -251,8 +251,7 @@ RemoteBuilder.findJob = function(bee){
             creep.memory.job = this.jobList.Build;
             creep.memory.target = constructionSite.id;
         } else { // If there is no build-task, turn to upgrade controller
-            creep.memory.job = this.jobList.Upgrade;
-            creep.say('📢 进行升级任务');
+            creep.say('📢 等待修建任务');
         }
     }
 };

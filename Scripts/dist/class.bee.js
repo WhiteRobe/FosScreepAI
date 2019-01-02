@@ -21,16 +21,18 @@ const AISoldier = require('ai.soldier');
 */
 const ClassBee = class {
     constructor(creep, myComb){
-        this._creep = creep;
+        this._creep = creep; // Creep.class which this ClassBee warped
         this._myComb = myComb;
 
-        this._AI = undefined;
+        this._AI = undefined; // AI who drive this bee to move
 
-        this.creepName = creep.name;
+        this.creepName = creep.name; // A static memory, remember this creep in case it dies
         this.myQueen = myComb.myQueen;
     };
 
     get creep() {
+        // Never refresh creep at this segment, it's a waste of CPU
+        // Instead, refresh it in Method:run() -> get isAlive()
         return this._creep;
     }
 

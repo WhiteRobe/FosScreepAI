@@ -91,6 +91,7 @@ DefaultProducer.findSource = function(bee){
     // 2.Keep stay in position, until the Energy-Source nearby to be refreshed
     let creep = bee.creep;
     let sources = bee.myComb.resources.sources;
+    sources = _.map(sources , s => Game.getObjectById(s.id)); // hot-fix:refresh
     if(creep.pos.findInRange(FIND_MY_SPAWNS,1).length >0){
         sources = _.sortByOrder(sources,['energy'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
 
@@ -101,6 +102,7 @@ DefaultProducer.findSource = function(bee){
     }
     return sources[0];
 };
+
 
 DefaultProducer.findContainerOrStorage = function(bee, reverse=false){
     let resultStoreList = bee.myComb.room.find(FIND_STRUCTURES,

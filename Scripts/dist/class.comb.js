@@ -20,8 +20,10 @@ const ClassComb = class {
         this._room = room;
         this._myQueen = myQueen;
 
+        // Remember to fresh these when use
         this.resources = {}; // A resources map contains key:sources(list[Resource]) and key:mineral(Mineral)
         this.spawns = []; // A array store your STRUCTURE_SPAWNS in this comb
+
         this.bees = []; // A array store your bees/creeps belong to this comb
         this.structures = []; // A array store your structures belong to this comb(store by object.id)
 
@@ -32,6 +34,12 @@ const ClassComb = class {
     };
 
     get room() {
+        // When try to get a GameObject Room, refresh it first
+        try{
+            this._room = Game.rooms[this._room.name];
+        }catch (e) {
+            console.log(`${Game.time}|${this.combName}: Room maybe ruined, please check!`)
+        }
         return this._room;
     }
 
@@ -258,7 +266,9 @@ const ClassComb = class {
      * @param beeList : a Population-Summary object
      */
     oviposit(beeList){
-        this.room = Game.rooms[this.room.name]; // refresh room's status -- Hot-fix
+        // refresh room's status -- Hot-fix
+        this.spawns = _.map(this.spawns, s => Game.spawns[s.name]);
+
         this.womb.oviposit(this, beeList);
     }
 
