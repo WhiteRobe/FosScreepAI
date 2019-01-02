@@ -65,9 +65,8 @@ class ProducerInterface{
      * @param{boolean} reverse=false : Spawn will be front
      * @return{array} : result of this method
      */
-    findExtensionOrSpawn(bee, reverse=false){
+    findExtensionOrSpawn(bee, reverse=false){}
 
-    }
     /**
      * Behavior : Store Energy and Mineral
      * @param{ClassBee} bee : the bee carry out this action
@@ -84,7 +83,7 @@ class ProducerInterface{
 const DefaultConsumer = new ConsumerInterface();
 const DefaultProducer = new ProducerInterface();
 
-DefaultProducer.findSource = function(bee){
+DefaultProducer.findSource = function(bee, without){
     // Find an resources, order by amount or sort by L1
     // So, there will be two situation:
     // 1.Bee is newborn, he will find the Energy-Source with less harvester around
@@ -92,9 +91,8 @@ DefaultProducer.findSource = function(bee){
     let creep = bee.creep;
     let sources = bee.myComb.resources.sources;
     sources = _.map(sources , s => Game.getObjectById(s.id)); // hot-fix:refresh
-    if(creep.pos.findInRange(FIND_MY_SPAWNS,1).length >0){
+    if(creep.pos.findInRange(FIND_MY_SPAWNS,1).length > 0){
         sources = _.sortByOrder(sources,['energy'], ['desc']); // lodash 3.10 use sortByOrder() instead of orderBy()
-
     } else {
         sources = _.sortBy(sources, r =>
             Math.abs(creep.pos.x - r.pos.x) + Math.abs(creep.pos.y - r.pos.y)
@@ -127,7 +125,7 @@ DefaultProducer.findContainerOrStorage = function(bee, reverse=false){
 };
 
 DefaultProducer.findExtensionOrSpawn = function(bee, reverse=false){
-    let resultStoreList = bee.myComb.room.find(FIND_STRUCTURES,
+    let resultStoreList = bee.creep.room.find(FIND_STRUCTURES,
         {
             filter: s => (s.structureType === STRUCTURE_EXTENSION  || s.structureType === STRUCTURE_SPAWN)
                 && s.energy < s.energyCapacity

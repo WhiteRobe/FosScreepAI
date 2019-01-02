@@ -371,7 +371,7 @@ RemoteTransfer.march = function(bee){
                     creep.say("🚇 行军中");
                 }
         }
-    } else{
+    } else {
         this.findJob(bee);
     }
 };

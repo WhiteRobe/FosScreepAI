@@ -113,16 +113,30 @@ DefaultHarvester.findJob = function (bee) {
     creep.say("🕗 找工作中");
 
     if(creep.carry.energy >= creep.carryCapacity){
-        let targetList = DefaultProducer.findExtensionOrSpawn(bee, false); // extension first
+        let targetList = DefaultProducer.findExtensionOrSpawn(bee, false); // Extension first
         if(targetList.length>0){
             creep.memory.target = targetList[0].id;
             creep.memory.job = this.jobList.Transfer;
-        } else {
-            creep.say("❌ 等待存储点...");
+            return;
         }
 
+        targetList = DefaultProducer.findContainerOrStorage(bee, false); // Container first
+        if(targetList.length>0){
+            creep.memory.target = targetList[0].id;
+            creep.memory.job = this.jobList.Transfer;
+            return;
+        }
+
+        creep.say("❌ 等待存储点...");
+
     } else {
-        let target = DefaultProducer.findSource(bee); // @see interface.civilian
+        // let target = DefaultProducer.findSource(bee); // @see interface.civilian
+        // hot-fix for now [begin]
+        let sources = bee.myComb.resources.sources;
+        sources = _.map(sources , s => Game.getObjectById(s.id)); // hot-fix:refresh
+        sources = _.sortByOrder(sources,['energy'], ['desc']);
+        // hot-fix [end]
+        let target = sources[0];
         if(target){
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Harvest;

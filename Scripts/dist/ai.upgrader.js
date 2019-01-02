@@ -129,7 +129,7 @@ DefaultUpgrader.withdraw = function (bee) {
     if(target){
         let energy = creep.room.energyAvailable;
         let capacity = creep.room.energyCapacityAvailable;
-        let properWithdrawNum = energy-Math.ceil(0.5 * capacity);
+        let properWithdrawNum = energy-Math.ceil(0.4 * capacity);
         let actionStatus = creep.withdraw(target, RESOURCE_ENERGY,
             Math.min(properWithdrawNum, creep.carryCapacity)-creep.carry[RESOURCE_ENERGY]);
         switch (actionStatus) {

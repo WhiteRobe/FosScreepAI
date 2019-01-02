@@ -30,6 +30,7 @@ const ClassComb = class {
         this.combIsAvaliable = false;
         this.womb = new Womb.ClassCombWomb();
 
+        this.memory={};
         // this.junction();
     };
 
