@@ -376,5 +376,38 @@ RemoteTransfer.march = function(bee){
     }
 };
 
+RemoteTransfer.findNextStorage = function(bee, currentTargetId){
+    let creep = bee.creep; // 临时修正
+    let target = undefined;
+
+    let tempStoreList = DefaultProducer.findExtensionOrSpawn(bee, false);
+    tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
+        Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
+    );
+    if(currentTargetId){// If has memory, then pick next one for it
+        tempStoreList = _.filter(tempStoreList, t => t.id!==currentTargetId);
+    }
+
+    target = tempStoreList[0];// Find closest one
+    if(target){
+        return target;
+    }
+
+    tempStoreList = DefaultProducer.findContainerOrStorage(bee, false);
+    tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
+        Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
+    );
+    if(currentTargetId){// If has memory, then pick next one for it
+        tempStoreList = _.filter(tempStoreList, t => t.id!==currentTargetId);
+    }
+
+    target = tempStoreList[0];
+
+    if(!target){
+        target = bee.myComb.room.storage;
+    }
+    return target;
+};
+
 module.exports.DefaultTransfer = DefaultTransfer;
 module.exports.RemoteTransfer = RemoteTransfer;
