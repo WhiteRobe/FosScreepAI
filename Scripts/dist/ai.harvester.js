@@ -210,6 +210,12 @@ IntentHarvester.findJob = function(bee){
         // In range-1, no need assign a target, it's a waste of CPU
         creep.memory.job = this.jobList.Transfer;
     } else {
+
+        if(creep.carry.energy > 0){ // Any way, in this tick just drop all the resources
+            creep.drop(RESOURCE_ENERGY);
+            creep.say("🌝 丢弃资源！");
+        }
+
         let target = DefaultProducer.findSource(bee); // @see interface.civilian
         if(target){
             creep.memory.target = target.id;
@@ -226,14 +232,10 @@ IntentHarvester.transfer = function(bee){
     let containers = creep.pos.findInRange(FIND_STRUCTURES, 1);
     containers = _.filter(containers, s => s.structureType === STRUCTURE_CONTAINER);
     let target = containers[0];
+
     if(target){
         creep.transfer(target, RESOURCE_ENERGY); // in range 1
         creep.say("⛽ 暂存资源！");
-    }
-
-    if(creep.carry.energy > 0){ // Any way, in this tick just drop all the resources
-        creep.drop(RESOURCE_ENERGY);
-        creep.say("🌝 丢弃资源！");
     }
 
     creep.memory.job = this.jobList.None; // Job is done

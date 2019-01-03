@@ -157,7 +157,12 @@ function decideType(comb, occupation) {
             break;
         case MK.ROLE.Upgrader.value: // Upgrader have the same parts with builder
         case MK.ROLE.Builder.value:
-            if(roomLevel <=2) result.part = [WORK, CARRY, MOVE];
+            if(roomLevel === 1) result.part = [WORK, CARRY, MOVE];
+            else if(roomLevel ===2){
+                if(roomEnergy <= 200) result.part = [WORK, CARRY, MOVE];
+                else if(roomEnergy <= 300) result.part = [WORK, WORK, CARRY, MOVE];
+                else result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+            }
             else if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
                 result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
             } else {
@@ -247,13 +252,13 @@ const populationPlan = {
         // energyCapacity : 300 + 5 * 50
         level:2,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
-            num : 0
+            num : 1
         },
         Upgrader : {
-            num : 0
+            num : 1
         },
         Fixer : {
             num : 1

@@ -229,12 +229,6 @@ DefaultTransfer.findJob = function(bee){
             droppedEnergyList = _.sortBy(droppedEnergyList, e =>
                 Math.abs(creep.pos.x-e.pos.x) + Math.abs(creep.pos.y-e.pos.y)
             );
-            // for(let e in droppedEnergyList){
-            //     if(creep.carryCapacity >= creep.carry.energy + e.amount){
-            //         target = e;
-            //         break;
-            //     }
-            // }
             target = droppedEnergyList[0];
         }
 
@@ -285,9 +279,11 @@ DefaultTransfer.findJob = function(bee){
         if(target){
             creep.memory.job = this.jobList.Transfer;
             creep.memory.target = target.id;
-        } else {
-            creep.say("❌ 无储存空间");
+            return;
         }
+
+
+        creep.say("❌ 无储存空间");
     }
 
 };
@@ -380,6 +376,7 @@ RemoteTransfer.findNextStorage = function(bee, currentTargetId){
     let creep = bee.creep; // 临时修正
     let target = undefined;
 
+    // 找到生物容器
     let tempStoreList = DefaultProducer.findExtensionOrSpawn(bee, false);
     tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
         Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
@@ -392,7 +389,7 @@ RemoteTransfer.findNextStorage = function(bee, currentTargetId){
     if(target){
         return target;
     }
-
+    // 找到存储器
     tempStoreList = DefaultProducer.findContainerOrStorage(bee, false);
     tempStoreList = _.sortBy(tempStoreList, s => // Order by L1
         Math.abs(creep.pos.x - s.pos.x) + Math.abs(creep.pos.y - s.pos.y)
