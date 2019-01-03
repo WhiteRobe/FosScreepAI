@@ -102,6 +102,96 @@ class AISoldierInterface extends AIInterface{
 const DefaultSoldier = new AISoldierInterface();
 DefaultSoldier.AIName = "DefaultSoldier";
 
+DefaultSoldier.findJob = function (bee) {
+    let creep = bee.creep;
+
+    // Find if I was in rampart, if not, go for cover
+    let myPos = creep.pos.look();
+    let inRampart = false;
+    for(let i in myPos){
+        let terrain = myPos[i];
+        if(terrain.structure && terrain.structure.structureType===STRUCTURE_RAMPART){
+            inRampart = true;
+            break;
+        }
+    }
+    if(!inRampart){
+        let target = creep.room.find(FIND_MY_STRUCTURES,{
+            filter : s => s.structureType === STRUCTURE_RAMPART
+        });
+        if(target[0]){
+            creep.memory.job = this.jobList.March;
+            creep.memory.target = target[0].id;
+            return;
+        }
+    }
+
+    // Else, find enemy
+    let target = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    if(target) {
+        creep.memory.job = this.jobList.Attack;
+        creep.memory.target = target.id;
+        return;
+    }
+
+    target = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES,{
+        filter: s => s.structureType !== STRUCTURE_ROAD
+    });
+    if(target) {
+        creep.memory.job = this.jobList.Attack;
+        creep.memory.target = target.id;
+        return;
+    }
+
+
+    creep.say("🔱 警戒中!");
+};
+
+DefaultSoldier.attack = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+    if(target && target.hits > 0){
+        let actionStatus = creep.rangedAttack(target);
+        switch (actionStatus) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
+                creep.say("⚔️ 进攻中!");
+                break;
+            case ERR_NO_BODYPART:
+                creep.say("❌ 没有武器!");
+                break;
+            case OK:
+                creep.say("🏹 我特么射爆!", true);
+                break;
+            default:
+                delete creep.memory.target;
+                this.findJob(bee);
+        }
+    } else {
+        creep.say("❗ 目标消失!");
+        delete creep.memory.target;
+        this.findJob(bee);
+    }
+};
+
+DefaultSoldier.march = function (bee) {
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+    if(target){
+        creep.moveTo(target);
+        creep.say("⛑️ 前往堡垒!");
+        if(creep.pos.isEqualTo(target.pos)){
+            creep.say("⛑️ 进入堡垒!");
+            delete creep.memory.target;
+            this.findJob(bee);
+        }
+
+    } else {
+        creep.say("⁉️ 堡垒不存在!");
+        delete creep.memory.target;
+        this.findJob(bee);
+    }
+};
 
 const RemoteSwordSoldier = new AISoldierInterface();
 RemoteSwordSoldier.AIName = "RemoteSwordSoldier";
@@ -153,7 +243,7 @@ RemoteSwordSoldier.attack = function(bee){
                 this.findJob(bee);
         }
     } else {
-        creep.say("❗ 没有目标!");
+        creep.say("❗ 目标消失!");
         delete creep.memory.target;
         this.findJob(bee);
     }

@@ -23,7 +23,7 @@ const ClassQueenMind = class {
             if(attackRoomName){
                 if(this.queen.homeComb.room.energyAvailable > 1000){
                     let status = this.queen.oviposit({
-                        part:[ATTACK, ATTACK, ATTACK, MOVE, MOVE, MOVE], // 420 energy
+                        part:[ MOVE, MOVE, ATTACK, ATTACK, ATTACK, MOVE], // 420 energy
                         memory:{
                             queenDirectly: true,
                             myCombName: 'Queen',

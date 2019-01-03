@@ -194,6 +194,9 @@ DefaultBuilder.withdraw = function(bee){
                 creep.moveTo(target, {visualizePathStyle: this.visualizePathStyle});
                 creep.say("🧀 获取资源!");
                 break;
+            case ERR_NOT_ENOUGH_ENERGY:
+                creep.say("🧀 等待获取资源!");
+                break;
             case OK:
             default:
                 // Job done or was valid
@@ -295,7 +298,7 @@ RemoteBuilder.withdraw = function(bee){
                 // Job done or was valid
                 delete creep.memory.target;
                 this.findJob(bee);
-            //creep.memory.job = this.jobList.None;
+                //creep.memory.job = this.jobList.None;
 
         }
         // console.log('UpgraderLog',Game.time, creep.name,`${creep.pos.x},${creep.pos.y}` ,JSON.stringify(creep.carry), actionStatus, target.structureType);

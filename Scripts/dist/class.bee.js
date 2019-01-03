@@ -114,7 +114,7 @@ const ClassBee = class {
         switch (occupation) {
             case MK.ROLE.Harvester.value:
                 if(parts.carry === 0) AI = AIHarvester.AlwaysHarvester;
-                else if(parts.work < 3) AI = AIHarvester.DefaultHarvester;
+                else if(parts.work <= 2) AI = AIHarvester.DefaultHarvester;
                 else AI = AIHarvester.IntentHarvester;
                 break;
             case MK.ROLE.Transfer.value:

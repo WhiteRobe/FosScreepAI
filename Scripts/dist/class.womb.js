@@ -45,7 +45,8 @@ const ClassCombWomb = class extends WombInterface{
                             typeResult.part ,
                             newBeeName,
                             {
-                                memory : typeResult.memory
+                                memory : typeResult.memory,
+                                directions: [BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT, RIGHT]
                             }
                         );
 
@@ -90,7 +91,8 @@ const ClassQueenWomb = class extends WombInterface{
                     beeInfo.part ,
                     newBeeName,
                     {
-                        memory : beeInfo.memory
+                        memory : beeInfo.memory,
+                        directions: [BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT, RIGHT]
                     }
                 );
 
@@ -128,24 +130,16 @@ function decideType(comb, occupation) {
 
     switch (occupation) {
         case MK.ROLE.Harvester.value:
-            if(roomLevel === 1) result.part = [WORK, CARRY, MOVE];
-            else if(roomLevel <= 3 ) {
-                if(roomEnergy <= 200) result.part = [WORK, CARRY, MOVE];
-                else if(roomEnergy <= 300) result.part = [WORK, WORK, CARRY, MOVE];
-                else if(roomEnergy <= 400) result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
-                else result.part = [WORK, WORK, WORK, CARRY, MOVE, MOVE];
-            }
-            else if(roomEnergy/roomEnergyCapacity>0.5 && 300<=roomEnergy && roomEnergy<400){
-                result.part = [WORK, WORK, CARRY, MOVE];
-            }
-            else if(roomEnergy/roomEnergyCapacity>0.5 && 400<=roomEnergy && roomEnergy<600){
-                result.part = [WORK, WORK, WORK, CARRY, MOVE];
-            }
-            else if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=600){
-                result.part = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE];
-            }
-            else{
-                result.part = [WORK, CARRY, MOVE];
+            // DefaultHarvester
+            if(roomLevel === 1|| roomEnergy < 300) result.part = [WORK, CARRY, MOVE];
+            else if( 300<=roomEnergy && roomEnergy<400) result.part = [WORK, WORK, CARRY, MOVE];
+            // IntentHarvester
+            else if( 400<=roomEnergy && roomEnergy<500) result.part = [WORK, WORK, WORK, CARRY, MOVE];
+            else if( 500<=roomEnergy && roomEnergy<600) result.part = [WORK, WORK, WORK, WORK, CARRY, MOVE];
+
+            else if( 600<=roomEnergy) {
+                if(roomLevel>=4) result.part = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE]; // AlwaysHarvester:600
+                else result.part = [WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE]; // IntentHarvester:550
             }
             break;
         case MK.ROLE.Transfer.value:
@@ -157,27 +151,19 @@ function decideType(comb, occupation) {
             break;
         case MK.ROLE.Upgrader.value: // Upgrader have the same parts with builder
         case MK.ROLE.Builder.value:
-            if(roomLevel === 1) result.part = [WORK, CARRY, MOVE];
-            else if(roomLevel ===2){
-                if(roomEnergy <= 200) result.part = [WORK, CARRY, MOVE];
-                else if(roomEnergy <= 300) result.part = [WORK, WORK, CARRY, MOVE];
-                else result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
-            }
-            else if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
-                result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
-            } else {
-                result.part = [WORK, CARRY, MOVE];
-            }
+            if(roomLevel === 1 || roomEnergy < 300) result.part = [WORK, CARRY, MOVE];
+            else if(300 <= roomEnergy && roomEnergy < 400) result.part = [WORK, WORK, CARRY, MOVE];
+            else if(400 <= roomEnergy) result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
             break;
         case MK.ROLE.Fixer.value:
-            if(roomLevel >= 5) result.part = [WORK, CARRY, CARRY, MOVE, MOVE];
+            if(roomLevel >= 4) result.part = [WORK, CARRY, CARRY, MOVE, MOVE];
             else result.part = [WORK, CARRY, MOVE];
             break;
         case MK.ROLE.Soldier.value:
-            if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=400){
-                result.part = [TOUGH, TOUGH, TOUGH, TOUGH, ATTACK, ATTACK, MOVE, MOVE, MOVE];
+            if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=350){
+                result.part = [MOVE, RANGED_ATTACK, RANGED_ATTACK];
             } else {
-                result.part = [TOUGH, ATTACK, MOVE];
+                result.part = [TOUGH, MOVE, ATTACK];
             }
             break;
         default:
