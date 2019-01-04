@@ -43,7 +43,7 @@ function timeSchedule() {
 
     if(Game.time % 1000 === 1){
         queen.junction(
-            () => console.log(`${Game.time}|${queen.homeRoom}:Queen's nerual junction has been rebuilt!`)
+            () => console.log(`${Game.time}|${queen.homeRoom}: Queen's nerual junction has been rebuilt!`)
         );
     }
 }

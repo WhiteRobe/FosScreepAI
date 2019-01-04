@@ -1,4 +1,5 @@
 const _ =require('lodash');
+const MK= require('magic.key');
 
 class ConsumerInterface{
     /**
@@ -45,7 +46,23 @@ class ProducerInterface{
 
     }
 
+    /**
+     * @Deprecated
+     * Behavior : Find A Proper Source
+     * @param{ClassBee} bee : the bee carry out this action
+     * @return{Source}
+     */
     findSource(bee){
+
+    }
+
+    /**
+     * Behavior : Find Sources Without Another Harvester
+     * @param{ClassBee} bee : the bee carry out this action
+     * @param{boolean} sortByDistance : Specify to return a sorted-by-asc list
+     * @return{Array}
+     */
+    findSourcesWithoutHarvester(bee, sortByDistance=false){
 
     }
 
@@ -83,7 +100,7 @@ class ProducerInterface{
 const DefaultConsumer = new ConsumerInterface();
 const DefaultProducer = new ProducerInterface();
 
-DefaultProducer.findSource = function(bee, without){
+DefaultProducer.findSource = function(bee){
     // Find an resources, order by amount or sort by L1
     // So, there will be two situation:
     // 1.Bee is newborn, he will find the Energy-Source with less harvester around
@@ -101,6 +118,32 @@ DefaultProducer.findSource = function(bee, without){
     return sources[0];
 };
 
+DefaultProducer.findSourcesWithoutHarvester = function(bee, sortByDistance=false){
+
+    let creep = bee.creep;
+    let properTargetList = [];
+
+    let sources = bee.myComb.resources.sources;
+    sources = _.map(sources , s => Game.getObjectById(s.id));
+    // Find Sources Without Another Harvester Around
+    for(let i=0;i<sources.length;i++){
+        let creepAroundList = sources[i].pos.lookFor(LOOK_CREEPS);
+        let isFoundAnotherHarvester = _.filter(creepAroundList,
+            c => c.memory.occupation===MK.ROLE.Harvester.value && c.id!==creep.id
+        ).length>0;
+        if(!isFoundAnotherHarvester){
+            properTargetList.push(sources[i]);
+        }
+    }
+    // Sort by L1
+    if(sortByDistance){
+        properTargetList = _.sortBy(properTargetList, r =>
+            Math.abs(creep.pos.x - r.pos.x) + Math.abs(creep.pos.y - r.pos.y)
+        );
+    }
+
+    return properTargetList;
+};
 
 DefaultProducer.findContainerOrStorage = function(bee, reverse=false){
     let resultStoreList = bee.creep.room.find(FIND_STRUCTURES,

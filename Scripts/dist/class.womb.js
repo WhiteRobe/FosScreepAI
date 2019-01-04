@@ -1,5 +1,6 @@
 const MK = require('magic.key');
 const Bee = require('class.bee');
+const _ = require('lodash');
 // const ClassComb = require('class.comb');
 
 const WombInterface = class {
@@ -37,12 +38,18 @@ const ClassCombWomb = class extends WombInterface{
         for(let type in beeList) { // O(T)=6
             let typeData = plan[type];
             // Make sure num of harvester always less than ths num of sources
-            let minNum = type===MK.ROLE.Harvester.value?Math.min(sourceNum, typeData.num):typeData.num;
+            let minNum = typeData.num;
+            if(type===MK.ROLE.Harvester.value){
+                minNum = Math.min(sourceNum, typeData.num);
+            } else if (type===MK.ROLE.Transfer.value) {
+                minNum = Math.min(sourceNum+1, typeData.num);
+            }
+
             if(beeList[type].length < minNum){ // Need to reproduce a bee
                 for(let s=spawnsIndexFrom; s<numOfSpawnInThisComb; s++){
                     let spawn = comb.spawns[s]; // Find a spawn not busy
                     if(!spawn.spawning){
-                        let newBeeName = MK.ROLE[type].shortcut+Game.time;
+                        let newBeeName = MK.ROLE[type].shortcut+Game.time+'_'+_.random(10086);
                         let typeResult = decideType(comb, type);
 
                         let actionStatus = spawn.spawnCreep(
@@ -50,7 +57,7 @@ const ClassCombWomb = class extends WombInterface{
                             newBeeName,
                             {
                                 memory : typeResult.memory,
-                                directions: [BOTTOM_LEFT, BOTTOM, BOTTOM_RIGHT, RIGHT]
+                                directions: [BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT]
                             }
                         );
 
@@ -90,7 +97,7 @@ const ClassQueenWomb = class extends WombInterface{
         for(let s=spawnsIndexFrom; s<numOfSpawnInThisComb; s++){
             let spawn = comb.spawns[s]; // Find a spawn not busy
             if(!spawn.spawning){
-                let newBeeName = 'Qs'+Game.time; // Queen Belong to
+                let newBeeName = 'Qs'+Game.time+'_'+_.random(10086); // Queen Belong to
                 let actionStatus = spawn.spawnCreep(
                     beeInfo.part ,
                     newBeeName,
@@ -143,7 +150,7 @@ function decideType(comb, occupation) {
 
             else if( 600<=roomEnergy) {
                 if(roomLevel>=4) result.part = [WORK, WORK, WORK, WORK, WORK, MOVE, MOVE]; // AlwaysHarvester:600
-                else result.part = [WORK, WORK, WORK, WORK, CARRY, MOVE, MOVE]; // IntentHarvester:550
+                else result.part = [WORK, WORK, WORK, WORK, WORK, CARRY, MOVE]; // IntentHarvester:550
             }
             break;
         case MK.ROLE.Transfer.value:
@@ -286,13 +293,13 @@ const populationPlan = {
         // energyCapacity : 300 + 20 * 50
         level:4,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
-            num : 1
+            num : 2
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
             num : 1

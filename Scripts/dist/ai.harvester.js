@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const AIInterface = require('interface.ai');
 const InterfaceCivilian = require('interface.civilian');
+const MK = require('magic.key');
 
 class AIHarvesterInterface extends AIInterface{
     constructor(){
@@ -267,7 +268,11 @@ AlwaysHarvester.findJob = function(bee){
     let creep = bee.creep;
     creep.say("🕗 找工作中");
     if(creep.carry.energy === 0){
-        let target = DefaultProducer.findSource(bee); // @see interface.civilian
+        // let target = DefaultProducer.findSource(bee); // @see interface.civilian
+
+        // 临时改用下面这个方法 : 找到一个周围没有采集者的能量点
+        let target = DefaultProducer.findSourcesWithoutHarvester(bee, true)[0];
+
         if(target){
             let containers = target.room.lookForAtArea(LOOK_STRUCTURES,
                 target.pos.y-1,target.pos.x-1,target.pos.y+1,target.pos.x+1, true);

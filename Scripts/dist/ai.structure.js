@@ -87,6 +87,13 @@ DefaultTower.findJob = function(beeStructure){
     if(closestHostile) {
         beeStructure.memory.job = this.jobList.Attack;
         beeStructure.memory.target = closestHostile.id;
+        try{
+            Game.notify(`${Game.time}|${beeStructure.myComb.combName}:
+                发现敌人[${closestHostile.owner.username}]入侵,\n${JSON.stringify(closestHostile)}`,1);
+        } catch (e) {
+            Game.notify(`${Game.time}|${beeStructure.myComb.combName}:
+                发现敌人入侵,\n${JSON.stringify(closestHostile)}`,1);
+        }
         return;
     }
 

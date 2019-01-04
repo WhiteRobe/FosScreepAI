@@ -257,9 +257,11 @@ DefaultTransfer.findJob = function(bee){
         containers = _.map(containers, s => s.structure);
 
         if(containers.length > 0){
-            containers = _.sortBy(containers, s => // Order by Manhattan-distance(L1)
-                Math.abs(creep.pos.x-s.pos.x) + Math.abs(creep.pos.y-s.pos.y)
-            );
+            // containers = _.sortBy(containers, s => // Order by Manhattan-distance(L1)
+            //     Math.abs(creep.pos.x-s.pos.x) + Math.abs(creep.pos.y-s.pos.y)
+            // );
+            // hot-fix临时修正为：提取最满的能量罐
+            containers = _.sortByOrder(containers, s => s.store[RESOURCE_ENERGY], ['desc']);
             target = containers[0];
         }
 
