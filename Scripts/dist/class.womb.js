@@ -27,6 +27,8 @@ const ClassCombWomb = class extends WombInterface{
 
         let plan = populationPlan[comb.room.controller.level]; // Find plan of this room level
         let numOfSpawnInThisComb = comb.spawns.length;
+        let sourceNum = comb.resources.sources.length;
+
         if(numOfSpawnInThisComb === 0){
             return console.log(`${Game.time}|${comb.combName}: Comb does's have any SPAWN!`);
         }
@@ -34,7 +36,9 @@ const ClassCombWomb = class extends WombInterface{
 
         for(let type in beeList) { // O(T)=6
             let typeData = plan[type];
-            if(beeList[type].length < typeData.num){ // Need to reproduce a bee
+            // Make sure num of harvester always less than ths num of sources
+            let minNum = type===MK.ROLE.Harvester.value?Math.min(sourceNum, typeData.num):typeData.num;
+            if(beeList[type].length < minNum){ // Need to reproduce a bee
                 for(let s=spawnsIndexFrom; s<numOfSpawnInThisComb; s++){
                     let spawn = comb.spawns[s]; // Find a spawn not busy
                     if(!spawn.spawning){
@@ -244,7 +248,7 @@ const populationPlan = {
             num : 1
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
             num : 1
@@ -260,13 +264,13 @@ const populationPlan = {
         // energyCapacity : 300 + 10 * 50
         level:3,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
             num : 1
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
             num : 1
@@ -304,7 +308,7 @@ const populationPlan = {
         // energyCapacity : 300 + 30 * 50
         level:5,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
             num : 2
@@ -331,7 +335,7 @@ const populationPlan = {
             num : 2
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
             num : 1
@@ -349,16 +353,16 @@ const populationPlan = {
             num : 1
         },
         Transfer :{
-            num : 0
+            num : 2
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
-            num : 0
+            num : 2
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0

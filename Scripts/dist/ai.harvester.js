@@ -42,8 +42,9 @@ class AIHarvesterInterface extends AIInterface{
                     break;
                 case OK:
                     if(creep.carry.energy === creep.carryCapacity){// Job is done
-                        creep.memory.job = this.jobList.None;
                         delete creep.memory.target;
+                        //creep.memory.job = this.jobList.None;
+                        this.findJob(bee);
                     }
                     break;
                 case ERR_TIRED:
@@ -58,8 +59,9 @@ class AIHarvesterInterface extends AIInterface{
             //console.log(`actionStatus:${actionStatus}`);
         } else {
             // Job is valid
-            creep.memory.job = this.jobList.None;
             delete creep.memory.target;
+            //creep.memory.job = this.jobList.None;
+            this.findJob(bee);
         }
     }
 
@@ -141,7 +143,7 @@ DefaultHarvester.findJob = function (bee) {
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Harvest;
         } else {
-            creep.say('❌ 房间里无能源点!');
+            creep.say('❌ 无能源点!');
         }
     }
 };
@@ -221,7 +223,7 @@ IntentHarvester.findJob = function(bee){
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Harvest;
         } else {
-            creep.say('❌ 房间里无能源点!');
+            creep.say('❌ 无能源点!');
         }
     }
 };
@@ -234,11 +236,19 @@ IntentHarvester.transfer = function(bee){
     let target = containers[0];
 
     if(target){
-        creep.transfer(target, RESOURCE_ENERGY); // in range 1
-        creep.say("⛽ 暂存资源！");
-    }
+        let actionStatus = creep.transfer(target, RESOURCE_ENERGY); // in range 1
+        switch (actionStatus) {
+            case ERR_FULL:
+                creep.drop(RESOURCE_ENERGY);
+                creep.say("🌝 丢弃资源！");
+                break;
+            default:
+                creep.say("⛽ 暂存资源！");
 
-    creep.memory.job = this.jobList.None; // Job is done
+        }
+    }
+    this.findJob(bee);
+    // creep.memory.job = this.jobList.None; // Job is done
 };
 
 /**
@@ -255,6 +265,7 @@ AlwaysHarvester.AIName = "AlwaysHarvester";
 
 AlwaysHarvester.findJob = function(bee){
     let creep = bee.creep;
+    creep.say("🕗 找工作中");
     if(creep.carry.energy === 0){
         let target = DefaultProducer.findSource(bee); // @see interface.civilian
         if(target){
@@ -270,7 +281,7 @@ AlwaysHarvester.findJob = function(bee){
             creep.say('💰 开采能源!');
         }
     } else {
-        creep.say('❌ 房间里无能源点!');
+        creep.say('❌ 无能源点!');
     }
 };
 

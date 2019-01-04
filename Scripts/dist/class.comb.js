@@ -260,6 +260,8 @@ const ClassComb = class {
     notify(event) {
         console.log(`${Game.time}|${this.combName}:Event-Attach =>\n ${JSON.stringify(event)}`);
         if (event) this.junction(); // 临时写法
+
+        Game.notify(`${Game.time}:\n${JSON.stringify(event)}`, 180);
     }
 
     /**

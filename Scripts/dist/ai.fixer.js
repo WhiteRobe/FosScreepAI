@@ -58,7 +58,7 @@ class AIFixerInterface extends AIInterface{
                     // Job done or was valid
                     delete creep.memory.target;
                     this.findJob(bee);
-                //creep.memory.job = this.jobList.None;
+                    //creep.memory.job = this.jobList.None;
 
             }
         } else {
@@ -88,7 +88,7 @@ class AIFixerInterface extends AIInterface{
                     // Job done or was valid
                     delete creep.memory.target;
                     this.findJob(bee);
-                //creep.memory.job = this.jobList.None;
+                    //creep.memory.job = this.jobList.None;
 
             }
         } else {
@@ -261,8 +261,8 @@ LorryFixer.withdraw = function(bee){
     let creep = bee.creep;
     let target = Game.getObjectById(creep.memory.target);
     if(target &&
-        ( target.energy!==undefined && target.energy < target.energyCapacity // hot-fix spawn or extension
-            || target.store!==undefined && target.store[RESOURCE_ENERGY] < target.storeCapacity)){
+        ( target.energy!==undefined && target.energy > 0 // hot-fix spawn or extension
+            || target.store!==undefined && target.store[RESOURCE_ENERGY] > 0)){
         let energy = creep.room.energyAvailable;
         let capacity = creep.room.energyCapacityAvailable;
         let properWithdrawNum = energy-Math.ceil(0.5 * capacity);

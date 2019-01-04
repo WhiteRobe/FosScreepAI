@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const AIInterface = require('interface.ai');
 
 class AIStructureInterface extends  AIInterface{
@@ -70,6 +71,18 @@ DefaultTower.AIName = "DefaultTower";
 DefaultTower.findJob = function(beeStructure){
     let structure = beeStructure.structure;
 
+    // Kill healer first
+    let hostileHealers = structure.room.find(FIND_HOSTILE_CREEPS,{
+        filter: c => c.getActiveBodyparts(HEAL) > 0
+    });
+    if(hostileHealers.length>0) {
+        // Find biggest healers
+        hostileHealers = _.sortByOrder(hostileHealers, c => c.getActiveBodyparts(HEAL), ['desc']);
+        beeStructure.memory.job = this.jobList.Attack;
+        beeStructure.memory.target = hostileHealers[0].id;
+        return;
+    }
+    // Then kill other hostiles
     let closestHostile = structure.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     if(closestHostile) {
         beeStructure.memory.job = this.jobList.Attack;
@@ -77,6 +90,7 @@ DefaultTower.findJob = function(beeStructure){
         return;
     }
 
+    // If no enemy, try repair road
     let roadsToRepair = structure.room.find(FIND_STRUCTURES, {
         filter: s => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax
     });
