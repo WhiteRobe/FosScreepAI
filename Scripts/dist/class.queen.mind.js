@@ -78,6 +78,24 @@ const ClassQueenMind = class {
                 }
             }
 
+            // 标记一个房间
+            let signRoomName = plan.signRoomName;
+            if(signRoomName){
+                let status = this.queen.oviposit({
+                    part:[MOVE], // 50 energy
+                    memory:{
+                        queenDirectly: true,
+                        myCombName: 'queen',
+                        targetRoomName: signRoomName,
+                        occupation: MK.ROLE.Soldier.value,
+                        profession: 'Sign'
+                    }
+                });
+                if(status === OK){
+                    delete Memory.plan.signRoomName;
+                }
+            }
+
             // 前往一个房间建造
             let buildRoomName = plan.buildRoomName;
             if(buildRoomName){
@@ -108,7 +126,6 @@ const ClassQueenMind = class {
                         memory:{
                             queenDirectly: true,
                             myCombName: 'queen',
-                            homeRoomName: this.queen.homeRoom,
                             targetRoomName: transferRoomName,
                             occupation: MK.ROLE.Transfer.value,
                             profession: 'RemoteTransfer'

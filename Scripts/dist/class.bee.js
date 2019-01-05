@@ -137,6 +137,7 @@ const ClassBee = class {
                 else if(this.creep.memory.profession === 'RemoteAttack') AI = AISoldier.RemoteSwordSoldier; // MagicKey link to class.queen.mind remain to fix
                 else if(this.creep.memory.profession === 'Reserve') AI = AISoldier.ReserveSoldier;
                 else if(this.creep.memory.profession === 'Claim') AI = AISoldier.ClaimSoldier;
+                else if(this.creep.memory.profession === 'Sign') AI = AISoldier.SignerSoldier;
                 else AI = AISoldier.DefaultSoldier;
                 break;
             default:

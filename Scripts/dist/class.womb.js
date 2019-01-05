@@ -336,7 +336,7 @@ const populationPlan = {
     6:{
         level:6,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
             num : 2
@@ -357,7 +357,7 @@ const populationPlan = {
     7:{
         level:7,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
             num : 2
@@ -366,7 +366,7 @@ const populationPlan = {
             num : 2
         },
         Fixer : {
-            num : 2
+            num : 1
         },
         Builder : {
             num : 1
@@ -378,19 +378,19 @@ const populationPlan = {
     8:{
         level:8,
         Harvester : {
-            num : 1
+            num : 2
         },
         Transfer :{
-            num : 0
+            num : 2
         },
         Upgrader : {
-            num : 1
+            num : 2
         },
         Fixer : {
-            num : 0
+            num : 1
         },
         Builder : {
-            num : 0
+            num : 1
         },
         Soldier :{
             num : 0

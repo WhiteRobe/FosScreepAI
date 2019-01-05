@@ -127,7 +127,7 @@ DefaultProducer.findSourcesWithoutHarvester = function(bee, sortByDistance=false
     sources = _.map(sources , s => Game.getObjectById(s.id));
     // Find Sources Without Another Harvester Around
     for(let i=0;i<sources.length;i++){
-        let creepAroundList = sources[i].pos.lookFor(LOOK_CREEPS);
+        let creepAroundList = sources[i].pos.findInRange(FIND_CREEPS, 1);
         let isFoundAnotherHarvester = _.filter(creepAroundList,
             c => c.memory.occupation===MK.ROLE.Harvester.value && c.id!==creep.id
         ).length>0;

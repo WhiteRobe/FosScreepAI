@@ -155,8 +155,9 @@ DefaultFixer.findJob = function(bee){
         }
 
     } else {
+        let minFixedNum = Math.pow(bee.myComb.room.controller.level, 2) * 5 * 1000;// 最小维修值
         let targets = creep.room.find(FIND_STRUCTURES, {
-            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 11 * 1000
+            filter: s => s.hits < s.hitsMax && s.hits < minFixedNum
         });
         if(targets.length>0){
             targets = _.sortBy(targets, s => s.hits);

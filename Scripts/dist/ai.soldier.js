@@ -12,7 +12,8 @@ class AISoldierInterface extends AIInterface{
             Reserve : 'Reserve',
             Patrol : 'Patrol',
             Attack : 'Attack',
-            March : 'March '
+            March : 'March ',
+            Sign : 'Sign'
         };
 
         this.visualizePathStyle = {
@@ -41,6 +42,10 @@ class AISoldierInterface extends AIInterface{
 
     attack(bee){
         console.log('Abstract Method:attack() in AISoldierInterface.class');
+    }
+
+    sign(bee){
+        console.log('Abstract Method:sign() in AISoldierInterface.class');
     }
 
     march(bee){
@@ -89,6 +94,9 @@ class AISoldierInterface extends AIInterface{
                     break;
                 case this.jobList.March:
                     this.march(bee);
+                    break;
+                case this.jobList.Sign:
+                    this.sign(bee);
                     break;
                 default:
                     creep.say('❌ 未知工作！');
@@ -339,7 +347,42 @@ ClaimSoldier.claim = function(bee){
 
 };
 
+const SignerSoldier = new AISoldierInterface();
+
+SignerSoldier.findJob = function(bee){
+    let creep = bee.creep;
+    creep.say("🕗 寻找控制器");
+    if(creep.room.name !== creep.memory.targetRoomName){
+        creep.memory.job = this.jobList.March;
+    } else {
+        creep.memory.job = this.jobList.Sign;
+    }
+};
+
+SignerSoldier.sign = function(bee){
+    let creep = bee.creep;
+    let controller = creep.room.controller;
+    if(controller){
+        let actionStatus = creep.signController(controller, ''+Memory.signMsg);
+        switch (actionStatus) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(controller, {visualizePathStyle: this.visualizePathStyle});
+                creep.say('🔹 标记房间...');
+                break;
+            case OK:
+                Game.notify(`${Game.time}|${creep.room.name}: 标记完毕-${Memory.signMsg}`, 10);
+                break;
+            default:
+                this.findJob(bee);
+        }
+    } else {
+        creep.say('❌ 没有目标!');
+        this.findJob(bee);
+    }
+};
+
 module.exports.DefaultSoldier = DefaultSoldier;
 module.exports.RemoteSwordSoldier = RemoteSwordSoldier;
 module.exports.ReserveSoldier = ReserveSoldier;
 module.exports.ClaimSoldier = ClaimSoldier;
+module.exports.SignerSoldier = SignerSoldier;
