@@ -75,37 +75,6 @@ const ClassCombWomb = class extends WombInterface{
             }
         }
     }
-
-    // 临时添加的方案
-    unitOviposit(comb, beeInfo){
-        let numOfSpawnInThisComb = comb.spawns.length;
-        let spawnsIndexFrom = 0;
-        for(let s=0; s<numOfSpawnInThisComb; s++){
-            let spawn = comb.spawns[s]; // Find a spawn not busy
-            if(!spawn.spawning){
-                let newBeeName = MK.ROLE[beeInfo.type].shortcut+Game.time+'_'+_.random(10086);
-
-                let actionStatus = spawn.spawnCreep(
-                    beeInfo.part ,
-                    newBeeName,
-                    {
-                        memory : beeInfo.memory,
-                        directions: [BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT]
-                    }
-                );
-
-                if(actionStatus === OK){
-                    console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return OK!`);
-                    let newBee = new Bee(Game.creeps[newBeeName], comb);
-                    comb.addBee(newBee);
-                } else {
-                    console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return ${spawnCodeToString(actionStatus)}!`);
-                }
-                spawnsIndexFrom += 1; // Note that this one/spawn has been used
-                break;
-            }
-        }
-    }
 };
 
 
@@ -210,6 +179,13 @@ function decideType(comb, occupation) {
                 result.part = [TOUGH, MOVE, ATTACK];
             }
             break;
+        case MK.ROLE.Miner.value:
+            if(roomEnergy/roomEnergyCapacity>0.5 && roomEnergy>=650){
+                result.part = [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE];
+            } else {
+                result.part = [WORK, CARRY, MOVE];
+            }
+            break;
         default:
             console.log(`${Game.time}|decideType:Error unknown-type [${occupation}]`);
     }
@@ -276,6 +252,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 0
         }
     },
     2:{
@@ -297,6 +276,9 @@ const populationPlan = {
             num : 1
         },
         Soldier :{
+            num : 0
+        },
+        Miner :{
             num : 0
         }
     },
@@ -320,6 +302,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 0
         }
     },
     4:{
@@ -341,6 +326,9 @@ const populationPlan = {
             num : 1
         },
         Soldier :{
+            num : 0
+        },
+        Miner :{
             num : 0
         }
     },
@@ -364,6 +352,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 0
         }
     },
     6:{
@@ -385,6 +376,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 1
         }
     },
     7:{
@@ -406,6 +400,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 1
         }
     },
     8:{
@@ -427,6 +424,9 @@ const populationPlan = {
         },
         Soldier :{
             num : 0
+        },
+        Miner :{
+            num : 1
         }
     }
 };

@@ -34,6 +34,12 @@ const _MagicKeyRole = {
         value : 'Fixer',
         shortcut : 'F'
         // description : 'Fixer will do the job of Fix-Structure or Heal'
+    },
+
+    Miner : {
+        value : 'Miner',
+        shortcut : 'M'
+        // description : 'Miner will do the job of Miner'
     }
 };
 

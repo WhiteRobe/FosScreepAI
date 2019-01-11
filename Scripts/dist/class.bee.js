@@ -113,10 +113,7 @@ const ClassBee = class {
 
         switch (occupation) {
             case MK.ROLE.Harvester.value:
-                if(this.creep.memory.profession) {
-                    if(this.creep.memory.profession === 'Miner') AI = AIHarvester.MineralHarvester;
-                }
-                else if(parts.carry === 0) AI = AIHarvester.AlwaysHarvester;
+                if(parts.carry === 0) AI = AIHarvester.AlwaysHarvester;
                 else if(parts.work <= 2) AI = AIHarvester.DefaultHarvester;
                 else AI = AIHarvester.IntentHarvester;
                 break;
@@ -142,6 +139,9 @@ const ClassBee = class {
                 else if(this.creep.memory.profession === 'Claim') AI = AISoldier.ClaimSoldier;
                 else if(this.creep.memory.profession === 'Sign') AI = AISoldier.SignerSoldier;
                 else AI = AISoldier.DefaultSoldier;
+                break;
+            case MK.ROLE.Miner.value:
+                 AI = AIHarvester.MineralHarvester;
                 break;
             default:
                 console.log(`${Game.time}${this.myComb.combName} : Decide AI Error => unknown-type [${occupation}]`);

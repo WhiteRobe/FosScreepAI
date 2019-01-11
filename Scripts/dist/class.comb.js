@@ -205,6 +205,7 @@ const ClassComb = class {
         let Fixer  = [];
         let Builder  = [];
         let Soldier  = [];
+        let Miner  = [];
 
         _.forEach(this.bees, bee =>{
             if(!bee.isAlive){
@@ -231,6 +232,9 @@ const ClassComb = class {
                     case MK.ROLE.Soldier.value:
                         Soldier.push(bee);
                         break;
+                    case MK.ROLE.Miner.value:
+                        Miner.push(bee);
+                        break;
                 }
             }
         });
@@ -239,7 +243,7 @@ const ClassComb = class {
 
         let beeList = { // Population-Summary
             Harvester, Transfer, Upgrader,
-            Fixer, Builder, Soldier
+            Fixer, Builder, Soldier, Miner
         };
 
         this.oviposit(beeList);
@@ -254,22 +258,6 @@ const ClassComb = class {
         // this.room = Game.getObjectById(this.room.id); // Refresh Data
         _.forEach(this.structures, structure => structure.run());
         _.forEach(this.bees, bee => bee.run());
-
-        // 临时添加
-        if(this.room.controller.level>=6){
-            if(Game.time % 1500 === 3 && this.combName === 'E39N45'){
-                let self = this;
-                this.womb.unitOviposit(this,{
-                    type: MK.ROLE.Harvester.value,
-                    part: [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE],
-                    memory:{
-                        'occupation' : MK.ROLE.Harvester.value,
-                        'myCombName' : self.combName,
-                        'profession' : 'Miner'
-                    }
-                });
-            }
-        }
     }
 
 
