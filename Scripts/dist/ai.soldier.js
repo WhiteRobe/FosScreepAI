@@ -371,6 +371,7 @@ SignerSoldier.sign = function(bee){
                 break;
             case OK:
                 Game.notify(`${Game.time}|${creep.room.name}: 标记完毕-${Memory.signMsg}`, 10);
+                this.findJob(bee);
                 break;
             default:
                 this.findJob(bee);

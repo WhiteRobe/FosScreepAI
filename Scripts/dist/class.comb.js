@@ -254,6 +254,22 @@ const ClassComb = class {
         // this.room = Game.getObjectById(this.room.id); // Refresh Data
         _.forEach(this.structures, structure => structure.run());
         _.forEach(this.bees, bee => bee.run());
+
+        // 临时添加
+        if(this.room.controller.level>=6){
+            if(Game.time % 1500 === 3 && this.combName === 'E39N45'){
+                let self = this;
+                this.womb.unitOviposit(this,{
+                    type: MK.ROLE.Harvester.value,
+                    part: [WORK,CARRY,MOVE,WORK,CARRY,MOVE,WORK,CARRY,MOVE],
+                    memory:{
+                        'occupation' : MK.ROLE.Harvester.value,
+                        'myCombName' : self.combName,
+                        'profession' : 'Miner'
+                    }
+                });
+            }
+        }
     }
 
 

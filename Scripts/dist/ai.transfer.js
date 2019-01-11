@@ -151,7 +151,12 @@ class AITransferInterface extends AIInterface{
             // If not found, or whatever:
             // Anyway, if there is a storage-structure;
             // noinspection JSValidateTypes
-            target = bee.myComb.room.storage;
+            // 临时改了这段 保证terminal里始终有一定能源
+            target = bee.myComb.room.terminal;
+            if(!target || target.store[RESOURCE_ENERGY]>10*1000) {
+                target = bee.myComb.room.storage;
+            }
+
         }
 
         return target;
@@ -225,7 +230,8 @@ DefaultTransfer.findJob = function(bee){
 
         let droppedEnergyList = creep.pos.findInRange(FIND_DROPPED_RESOURCES, currentSRange);
         if(droppedEnergyList.length > 0) { // Order by L1
-            droppedEnergyList = _.filter(droppedEnergyList, r => r.resourceType === RESOURCE_ENERGY);
+            droppedEnergyList = _.filter(droppedEnergyList,
+                    r => r.resourceType === RESOURCE_ENERGY && r.amount > 150);
             droppedEnergyList = _.sortBy(droppedEnergyList, e =>
                 Math.abs(creep.pos.x-e.pos.x) + Math.abs(creep.pos.y-e.pos.y)
             );
@@ -233,7 +239,8 @@ DefaultTransfer.findJob = function(bee){
         }
 
         if(target){
-            creep.memory.pickSearchingRange = creep.memory.pickSearchingRange - 2; // decrease by floor(5/2)=2
+            creep.memory.pickSearchingRange =
+                Math.max(creep.memory.pickSearchingRange - 2, 5); // decrease by floor(5/2)=2
             creep.memory.job = this.jobList.Pick;
             creep.memory.target = target.id;
             return;

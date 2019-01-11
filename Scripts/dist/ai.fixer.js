@@ -243,9 +243,9 @@ LorryFixer.findJob = function(bee){
             creep.memory.target = targets[0].id;
             return ;
         }
-
+        let minFixedNum = Math.pow(bee.myComb.room.controller.level, 2) * 5 * 1000;// 最小维修值
         targets = creep.room.find(FIND_STRUCTURES, {
-            filter: s => s.hits < s.hitsMax && s.hits< bee.myComb.room.controller.level * 15 * 1000
+            filter: s => s.hits < s.hitsMax && s.hits < minFixedNum
         });
         if(targets.length>0){
             targets = _.sortBy(targets, s => s.hits);

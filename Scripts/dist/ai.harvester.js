@@ -283,10 +283,10 @@ AlwaysHarvester.findJob = function(bee){
             creep.memory.target = target.id;
             creep.memory.job = this.jobList.Harvest;
         } else {
-            creep.say('💰 开采能源!');
+            creep.say('❌ 无能源点!');
         }
     } else {
-        creep.say('❌ 无能源点!');
+        creep.say('❌ 无事可做!');
     }
 };
 
@@ -327,6 +327,102 @@ AlwaysHarvester.harvest = function(bee){
     }
 };
 
+const MineralHarvester = new AIHarvesterInterface();
+MineralHarvester.AIName = "MineralHarvester";
+MineralHarvester.findJob = function(bee){
+    let creep = bee.creep;
+    let mineral = bee.myComb.resources.mineral;
+    creep.say("🕗 找工作中");
+    if(mineral && !creep.carry[mineral.mineralType]){
+        creep.memory.target = mineral.id;
+        creep.memory.job = this.jobList.Harvest;
+    } else {
+        // store resource
+        let terminal = creep.room.terminal;
+        creep.memory.mineralType = mineral.mineralType;
+        if(terminal){
+            creep.memory.target = terminal.id;
+            creep.memory.job = this.jobList.Transfer;
+            return;
+        }
+
+        let storage = creep.room.storage;
+        if(storage){
+            creep.memory.target = storage.id;
+            creep.memory.job = this.jobList.Transfer;
+            return;
+        }
+
+        creep.say('❌ 无储存点!');
+    }
+};
+
+MineralHarvester.harvest = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+
+    if(target){
+        let actionStatus = creep.harvest(target);
+        switch (actionStatus) {
+            case ERR_NOT_IN_RANGE:
+                creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
+                creep.say('⛏️ 开采矿物!');
+                break;
+            case ERR_NOT_FOUND:
+                creep.say('❌️ 需要矿物点!');
+                break;
+            case ERR_TIRED:
+            case ERR_NOT_ENOUGH_RESOURCES:
+                creep.say('🌙 等待资源重生!');
+                break;
+            case OK:
+                if(creep.carry[target.mineralType] === creep.carryCapacity){// Job is done
+                    delete creep.memory.target;
+                    //creep.memory.job = this.jobList.None;
+                    this.findJob(bee);
+                }
+                break;
+            default:
+                // Job cause fatal-error
+                creep.memory.job = this.jobList.None;
+                delete creep.memory.target;
+                if(creep.memory.containerPos) delete creep.memory.containerPos;
+        }
+        //console.log(`actionStatus:${actionStatus}`);
+    } else {
+        // Job is valid
+        creep.memory.job = this.jobList.None;
+        delete creep.memory.target;
+        if(creep.memory.containerPos) delete creep.memory.containerPos;
+    }
+};
+
+MineralHarvester.transfer = function(bee){
+    let creep = bee.creep;
+    let target = Game.getObjectById(creep.memory.target);
+    let actionStatus = creep.transfer(target, creep.memory.mineralType);
+    switch (actionStatus) {
+        case ERR_NOT_IN_RANGE:
+            creep.moveTo(target,{ visualizePathStyle:this.visualizePathStyle });
+            creep.say('🚒 运送矿物!');
+            break;
+        case OK:
+            break;
+        case ERR_FULL: // Just drop resources here
+            creep.drop(RESOURCE_ENERGY); // Waiting Transfer to pick these
+            break;
+        default:
+            // Job cause fatal-error
+            creep.memory.job = this.jobList.None;
+            delete creep.memory.target;
+    }
+    if(!creep.carry[creep.memory.mineralType]){ // Job is done
+        creep.memory.job = this.jobList.None;
+        delete creep.memory.target;
+    }
+};
+
 module.exports.DefaultHarvester = DefaultHarvester;
 module.exports.IntentHarvester = IntentHarvester;
 module.exports.AlwaysHarvester = AlwaysHarvester;
+module.exports.MineralHarvester = MineralHarvester;

@@ -113,7 +113,10 @@ const ClassBee = class {
 
         switch (occupation) {
             case MK.ROLE.Harvester.value:
-                if(parts.carry === 0) AI = AIHarvester.AlwaysHarvester;
+                if(this.creep.memory.profession) {
+                    if(this.creep.memory.profession === 'Miner') AI = AIHarvester.MineralHarvester;
+                }
+                else if(parts.carry === 0) AI = AIHarvester.AlwaysHarvester;
                 else if(parts.work <= 2) AI = AIHarvester.DefaultHarvester;
                 else AI = AIHarvester.IntentHarvester;
                 break;

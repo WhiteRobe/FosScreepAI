@@ -40,9 +40,9 @@ const ClassCombWomb = class extends WombInterface{
             // Make sure num of harvester always less than ths num of sources
             let minNum = typeData.num;
             if(type===MK.ROLE.Harvester.value){
-                minNum = Math.min(sourceNum, typeData.num);
+                minNum = typeData.num * sourceNum;
             } else if (type===MK.ROLE.Transfer.value) {
-                minNum = Math.min(sourceNum+1, typeData.num);
+                minNum = typeData.num * sourceNum;
             }
 
             if(beeList[type].length < minNum){ // Need to reproduce a bee
@@ -72,6 +72,37 @@ const ClassCombWomb = class extends WombInterface{
                         break;
                     }
                 }
+            }
+        }
+    }
+
+    // 临时添加的方案
+    unitOviposit(comb, beeInfo){
+        let numOfSpawnInThisComb = comb.spawns.length;
+        let spawnsIndexFrom = 0;
+        for(let s=0; s<numOfSpawnInThisComb; s++){
+            let spawn = comb.spawns[s]; // Find a spawn not busy
+            if(!spawn.spawning){
+                let newBeeName = MK.ROLE[beeInfo.type].shortcut+Game.time+'_'+_.random(10086);
+
+                let actionStatus = spawn.spawnCreep(
+                    beeInfo.part ,
+                    newBeeName,
+                    {
+                        memory : beeInfo.memory,
+                        directions: [BOTTOM, BOTTOM_RIGHT, RIGHT, TOP_RIGHT]
+                    }
+                );
+
+                if(actionStatus === OK){
+                    console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return OK!`);
+                    let newBee = new Bee(Game.creeps[newBeeName], comb);
+                    comb.addBee(newBee);
+                } else {
+                    console.log(`${Game.time}|${comb.combName}: Create Bee:${newBeeName}, return ${spawnCodeToString(actionStatus)}!`);
+                }
+                spawnsIndexFrom += 1; // Note that this one/spawn has been used
+                break;
             }
         }
     }
@@ -156,7 +187,8 @@ function decideType(comb, occupation) {
         case MK.ROLE.Transfer.value:
             if(roomLevel<=2) result.part = [CARRY, CARRY, MOVE];
             else{
-                if(roomEnergy>=300) result.part = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
+                if(300<=roomEnergy && roomEnergy<450) result.part = [CARRY, CARRY, CARRY, CARRY, MOVE, MOVE];
+                else if(roomEnergy>=450) result.part = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE,];
                 else result.part = [CARRY, CARRY, MOVE];
             }
             break;
@@ -164,7 +196,8 @@ function decideType(comb, occupation) {
         case MK.ROLE.Builder.value:
             if(roomLevel === 1 || roomEnergy < 300) result.part = [WORK, CARRY, MOVE];
             else if(300 <= roomEnergy && roomEnergy < 400) result.part = [WORK, WORK, CARRY, MOVE];
-            else if(400 <= roomEnergy) result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+            else if(400 <= roomEnergy && roomEnergy < 600) result.part = [WORK, WORK, CARRY, CARRY, MOVE, MOVE];
+            else if(600 <= roomEnergy) result.part = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE];
             break;
         case MK.ROLE.Fixer.value:
             if(roomLevel >= 4) result.part = [WORK, CARRY, CARRY, MOVE, MOVE];
@@ -249,7 +282,7 @@ const populationPlan = {
         // energyCapacity : 300 + 5 * 50
         level:2,
         Harvester : {
-            num : 2
+            num : 1
         },
         Transfer :{
             num : 1
@@ -271,7 +304,7 @@ const populationPlan = {
         // energyCapacity : 300 + 10 * 50
         level:3,
         Harvester : {
-            num : 2
+            num : 1
         },
         Transfer :{
             num : 1
@@ -293,10 +326,10 @@ const populationPlan = {
         // energyCapacity : 300 + 20 * 50
         level:4,
         Harvester : {
-            num : 2
+            num : 1
         },
         Transfer :{
-            num : 2
+            num : 1
         },
         Upgrader : {
             num : 2
@@ -315,10 +348,10 @@ const populationPlan = {
         // energyCapacity : 300 + 30 * 50
         level:5,
         Harvester : {
-            num : 2
+            num : 1
         },
         Transfer :{
-            num : 2
+            num : 1
         },
         Upgrader : {
             num : 2
@@ -336,10 +369,10 @@ const populationPlan = {
     6:{
         level:6,
         Harvester : {
-            num : 2
+            num : 1
         },
         Transfer :{
-            num : 2
+            num : 1
         },
         Upgrader : {
             num : 2
