@@ -43,6 +43,8 @@ const ClassCombWomb = class extends WombInterface{
                 minNum = typeData.num * sourceNum;
             } else if (type===MK.ROLE.Transfer.value) {
                 minNum = typeData.num * sourceNum;
+            } else if (type===MK.ROLE.Builder.value) {
+                minNum = typeData.num * sourceNum;
             }
 
             if(beeList[type].length < minNum){ // Need to reproduce a bee

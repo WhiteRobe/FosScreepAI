@@ -41,9 +41,9 @@ const ClassQueenMind = class {
             // 将一个房间设为保留领地
             let reserveRoomName = plan.reserveRoomName;
             if(reserveRoomName){
-                if(this.queen.homeComb.room.energyAvailable > 1500){
+                if(this.queen.homeComb.room.energyAvailable >= 1300){
                     let status = this.queen.oviposit({
-                        part:[CLAIM, MOVE], // 650 energy
+                        part:[CLAIM, CLAIM, MOVE, MOVE], // 1300 energy
                         memory:{
                             queenDirectly: true,
                             myCombName: 'Queen',
@@ -126,6 +126,7 @@ const ClassQueenMind = class {
                         memory:{
                             queenDirectly: true,
                             myCombName: 'queen',
+                            homeRoomName: this.queen.homeRoom,
                             targetRoomName: transferRoomName,
                             occupation: MK.ROLE.Transfer.value,
                             profession: 'RemoteTransfer'

@@ -46,4 +46,8 @@ function timeSchedule() {
             () => console.log(`${Game.time}|${queen.homeRoom}: Queen's nerual junction has been rebuilt!`)
         );
     }
+
+    if(Game.time % 500 === 13){
+        Memory.plan.reserveRoomName = 'E37N46';
+    }
 }
