@@ -39,11 +39,13 @@ module.exports = function(grunt) {
 
 进入`.\Screeps\Scripts`，依次执行以下命令：
 
-    npm install -g grunt-cli
-    
-    npm install grunt --save-dev
-    
-    npm install grunt-screeps
+```shell
+npm install -g grunt-cli
+
+npm install grunt --save-dev
+
+npm install grunt-screeps
+```
 
 **不建议**直接利用Scripts中的`package-lock.json`执行`npm init`；
 
@@ -67,7 +69,3 @@ module.exports = function(grunt) {
     <img src="docs/pic/leadboard.png" alt="leadborad"/>
 </p>
 
-
-```
-
-```
