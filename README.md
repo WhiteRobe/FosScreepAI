@@ -1,13 +1,12 @@
-## 这是Screep的AI脚本
+## 这是我的Screep AI脚本
 
-这游戏真好玩，我现在满脑子都是编程!!!!
+> 这游戏真好玩，我现在满脑子都是编程!!!!
 
 在`\Screeps\Scripts`下创建`Gruntfile.js`，内容为：
 
-`
+```javascript
 module.exports = function(grunt) {
-
-    grunt.loadNpmTasks('grunt-screeps');
+    grunt.loadNpmTasks('grunt-screeps')
 
     grunt.initConfig({
         screeps: {
@@ -22,10 +21,10 @@ module.exports = function(grunt) {
             }
         }
     });
-}`
+}
+```
 
-## 
-以下内容为项目配置，它来自:[https://gitee.com/shenpibaipao/ScreepLocalCodeIDE](https://gitee.com/shenpibaipao/ScreepLocalCodeIDE)
+以下内容为项目配置，它来自:[WhiteRobe/ScreepLocalCodingEnv](https://github.com/WhiteRobe/ScreepLocalCodingEnv)
 
 ## Screep游戏本地编码环境
 
@@ -37,12 +36,13 @@ module.exports = function(grunt) {
 项目环境为Node.js,需要搭建grunt及其脚手架.
 
 具体过程为：
+
 进入`.\Screeps\Scripts`，依次执行以下命令：
 
     npm install -g grunt-cli
-
+    
     npm install grunt --save-dev
-
+    
     npm install grunt-screeps
 
 **不建议**直接利用Scripts中的`package-lock.json`执行`npm init`；
@@ -58,3 +58,16 @@ module.exports = function(grunt) {
 功能来自Github:[ScreepsAutocomplete](https://github.com/Garethp/ScreepsAutocomplete)，已集成到了`./lib/`文件夹下，推荐使用WebStorm来搭建环境(*更佳的提示和静态检验*)，当然更优雅的方式是使用 `ATOM` 或是 `VS CODE`.
 
 详见:[https://github.com/Garethp/ScreepsAutocomplete](https://github.com/Garethp/ScreepsAutocomplete)
+
+## 排行榜
+
+无人监管情况下，连续运行数个月，其中经历过被攻击、服务器炸服、所有Screeps数据被清零等特殊情况，仅依靠三个房间达到以下成就：
+
+<p align="center">
+    <img src="docs/pic/leadboard.png" alt="leadborad"/>
+</p>
+
+
+```
+
+```
