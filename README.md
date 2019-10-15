@@ -1,5 +1,7 @@
 ## 这是我的Screep AI脚本
 
+<a href="https://zenodo.org/badge/latestdoi/214948476"><img src="https://zenodo.org/badge/214948476.svg" alt="DOI"></a>
+
 > 这游戏真好玩，我现在满脑子都是编程!!!!
 
 在`\Screeps\Scripts`下创建`Gruntfile.js`，内容为：
